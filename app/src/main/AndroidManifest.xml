@@ -16,6 +16,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".BtcActivity" android:label="BTC Rates"
+            android:parentActivityName=".HomeActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity"/>
+        </activity>
+
+        <activity android:name=".EthActivity" android:parentActivityName=".HomeActivity"
+            android:label="ETH Rates">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity"/>
+
+        </activity>
     </application>
 
 </manifest>
