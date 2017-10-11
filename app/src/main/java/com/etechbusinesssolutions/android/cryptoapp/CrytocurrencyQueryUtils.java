@@ -25,6 +25,30 @@ import static com.etechbusinesssolutions.android.cryptoapp.BtcFragment.LOG_TAG;
 
 public class CrytocurrencyQueryUtils {
 
+    // Array for names of currencies
+    static String[] majorCur = {
+            "USD",
+            "EUR",
+            "NGN",
+            "RUB",
+            "CAD",
+            "JPY",
+            "GBP",
+            "AUD",
+            "INR",
+            "HKD",
+            "IDR",
+            "SGD",
+            "CHF",
+            "CNY",
+            "ZAR",
+            "THB",
+            "SAR",
+            "KRW",
+            "GHS",
+            "BRL"
+    };
+
     /**
      * Create a private constructor because no one should ever create a {@link CrytocurrencyQueryUtils} object.
      * This class is only meant to hold static variables and methods, which can be accessed
@@ -53,20 +77,42 @@ public class CrytocurrencyQueryUtils {
             // Create JSONObject from the JSON response string
             JSONObject baseJsonResponse = new JSONObject(cryptoJSON);
 
-            // Iterate over the returned object and get the keys and values
-            // and add that to the List
-            for (int i = 0; i < baseJsonResponse.length(); i++) {
+            // Get the two JSONObject within the baseJsonResponse
+            JSONObject eth = baseJsonResponse.getJSONObject("ETH");
+            JSONObject btc = baseJsonResponse.getJSONObject("BTC");
 
-                String currency = baseJsonResponse.keys().next();
-                long value = baseJsonResponse.getLong(currency);
+            for ( int i = 0; i < eth.length(); i++) {
+
+                //TODO: Tidy
+                //String ethCurrency = eth.keys().next();
+                long ethValue = eth.getLong(majorCur[i]);
+
+                //String btcCurrency = btc.keys().next();
+                long btcValue = btc.getLong(majorCur[i]);
 
                 // Create a new {@link Currency} object with the key, and value
                 //TODO: insert real image id values
-                Currency cur = new Currency(currency, value, 3);
+                Currency cur = new Currency(majorCur[i], ethValue, btcValue, 3);
 
                 // Add the new {@link Currency} object to the list of currencies
                 cryptoValues.add(cur);
+
             }
+
+            // Iterate over the returned object and get the keys and values
+            // and add that to the List
+//            for (int i = 0; i < baseJsonResponse.length(); i++) {
+//
+//                String currency = baseJsonResponse.keys().next();
+//                long value = baseJsonResponse.getLong(currency);
+//
+//                // Create a new {@link Currency} object with the key, and value
+//                //TODO: insert real image id values
+//                Currency cur = new Currency(currency, value, 3);
+//
+//                // Add the new {@link Currency} object to the list of currencies
+//                cryptoValues.add(cur);
+//            }
 
 
         } catch (JSONException e) {
