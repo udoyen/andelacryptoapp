@@ -8,6 +8,10 @@ public class EthActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_eth);
+        setContentView(R.layout.activity_base_currency);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, new EthFragment())
+                .commit();
+
     }
 }

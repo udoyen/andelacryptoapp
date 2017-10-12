@@ -8,6 +8,9 @@ public class BtcActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_btc);
+        setContentView(R.layout.activity_base_currency);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, new BtcFragment())
+                .commit();
     }
 }
