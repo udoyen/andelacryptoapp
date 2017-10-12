@@ -1,11 +1,33 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
+import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
-public class HomeActivity extends AppCompatActivity {
+import java.util.List;
+
+public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
+
+    //TODO: Remove
+    public static final String LOG_TAG = HomeActivity.class.getSimpleName();
+
+    // URL for the currency data from cryptocompare
+    private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
+
+    /**
+     * Constant value for the earthquake loader ID. We can choose any integer
+     * This really comes into play when you're using multiple loaders
+     */
+    private static final int CRYPTOCURRENCY_LOADER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +52,62 @@ public class HomeActivity extends AppCompatActivity {
         assert tabLayout != null;
         tabLayout.setupWithViewPager(viewPager);
 
+        // Get a reference to the ConnectivityManager to check state of network connectivity
+        Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        //check internet connection
+        Log.i(LOG_TAG, "TEST: Internet connection checked ...");
+        NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
+
+
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()){
+
+            // Get a reference to the loader manager in order to interact with loaders
+            Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
+            LoaderManager loaderManager = getLoaderManager();
+
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            Log.i(LOG_TAG, "TEST: Calling initloader()...");
+            loaderManager.initLoader(CRYPTOCURRENCY_LOADER_ID, null, this);
+
+        }
+
+
+
+    }
+
+
+    @Override
+    public Loader<List<Currency>> onCreateLoader(int id, Bundle args) {
+
+        // Create a new loader for the given URL
+        Log.i(LOG_TAG, "TEST: onCreateLoader() called ...");
+
+        // Setup the baseURI
+        Uri baseUri = Uri.parse(CRYPTO_CURRENRY_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        uriBuilder.appendQueryParameter("fsyms", "ETH,BTC");
+        uriBuilder.appendQueryParameter("tsyms", "USD,EUR,NGN,RUB,CAD,JPY,GBP,AUD,INR,HKD,IDR,SGD,CHF,CNY,ZAR,THB,SAR,KRW,GHS,BRL");
+
+        Log.i(LOG_TAG, "TEST: uriBuilder String" + uriBuilder.toString());
+
+        return new CrytoCurrencyLoader(this, uriBuilder.toString());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Currency>> loader, List<Currency> data) {
+        Log.i(LOG_TAG, "TEST: onLoadFinished() called ...");
+
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<List<Currency>> loader) {
+        Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
 
     }
 }

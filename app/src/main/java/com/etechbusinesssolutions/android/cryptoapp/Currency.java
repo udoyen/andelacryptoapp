@@ -4,7 +4,7 @@ package com.etechbusinesssolutions.android.cryptoapp;
  * Created by george on 10/10/17.
  */
 
-class Currency {
+public class Currency {
 
     private String cName;
     private long cEthValue;

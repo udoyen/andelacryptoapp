@@ -33,6 +33,7 @@ public class CrytoCurrencyLoader extends AsyncTaskLoader<List<Currency>> {
         if (cUrl == null) {
              return null;
         }
-        return null;
+
+        return CrytocurrencyQueryUtils.fetchCurrencyData(cUrl);
     }
 }

@@ -23,10 +23,10 @@ import static com.etechbusinesssolutions.android.cryptoapp.BtcFragment.LOG_TAG;
  * Created by george on 10/10/17.
  */
 
-public class CrytocurrencyQueryUtils {
+class CrytocurrencyQueryUtils {
 
     // Array for names of currencies
-    static String[] majorCur = {
+    private static String[] majorCur = {
             "USD",
             "EUR",
             "NGN",
@@ -81,6 +81,8 @@ public class CrytocurrencyQueryUtils {
             JSONObject eth = baseJsonResponse.getJSONObject("ETH");
             JSONObject btc = baseJsonResponse.getJSONObject("BTC");
 
+            // Iterate over the returned object and get the keys and values
+            // and add that to the List
             for ( int i = 0; i < eth.length(); i++) {
 
                 //TODO: Tidy
@@ -98,21 +100,6 @@ public class CrytocurrencyQueryUtils {
                 cryptoValues.add(cur);
 
             }
-
-            // Iterate over the returned object and get the keys and values
-            // and add that to the List
-//            for (int i = 0; i < baseJsonResponse.length(); i++) {
-//
-//                String currency = baseJsonResponse.keys().next();
-//                long value = baseJsonResponse.getLong(currency);
-//
-//                // Create a new {@link Currency} object with the key, and value
-//                //TODO: insert real image id values
-//                Currency cur = new Currency(currency, value, 3);
-//
-//                // Add the new {@link Currency} object to the list of currencies
-//                cryptoValues.add(cur);
-//            }
 
 
         } catch (JSONException e) {
