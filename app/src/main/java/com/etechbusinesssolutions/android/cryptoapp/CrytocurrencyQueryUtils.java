@@ -23,7 +23,7 @@ import static com.etechbusinesssolutions.android.cryptoapp.BtcFragment.LOG_TAG;
  * Created by george on 10/10/17.
  */
 
-class CrytocurrencyQueryUtils {
+public class CrytocurrencyQueryUtils {
 
     // Array for names of currencies
     private static String[] majorCur = {

@@ -9,7 +9,7 @@ import android.util.Log;
  * Created by george on 10/11/17.
  */
 
-class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
+public class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
 
     // Used for loggin
     //TODO: Remove
@@ -24,7 +24,7 @@ class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
     /**
      * Database version. If you change the database schema, you must increment the database version.
      */
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     /**
      * Constructs a new instance of {@link CryptoCurrencyDBHelper}.
@@ -49,8 +49,8 @@ class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
         String SQL_CREATE_CURRENCY_TABLE = "CREATE TABLE " + CryptoContract.CurrencyEntry.TABLE_NAME + " ("
                 + CryptoContract.CurrencyEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME + " TEXT NOT NULL, "
-                + CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE + "REAL NOT NULL DEFAULT 0, "
-                + CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE + "REAL NOT NULL DEFAULT 0);";
+                + CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE + " REAL NOT NULL DEFAULT 0, "
+                + CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE + " REAL NOT NULL DEFAULT 0);";
 
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_CURRENCY_TABLE);

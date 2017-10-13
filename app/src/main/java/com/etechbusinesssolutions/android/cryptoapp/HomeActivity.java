@@ -2,8 +2,10 @@ package com.etechbusinesssolutions.android.cryptoapp;
 
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Loader;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -13,12 +15,19 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
+
 import java.util.List;
+
+import static com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.CurrencyEntry;
 
 public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
 
     //TODO: Remove
     public static final String LOG_TAG = HomeActivity.class.getSimpleName();
+
+    //Create an instance of CryptoCurrencyDBHelper
+    private CryptoCurrencyDBHelper mDBHelper;
 
     // URL for the currency data from cryptocompare
     private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
@@ -102,6 +111,31 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onLoadFinished(Loader<List<Currency>> loader, List<Currency> data) {
         //TODO: Load the information from CryptocrrencyQueryUtils into database using content provider
         Log.i(LOG_TAG, "TEST: onLoadFinished() called ...");
+        Log.i(LOG_TAG, "TEST: Database data insertion started ...");
+        //Instantiate the CryptoCurrencyDBHelper
+        mDBHelper = new CryptoCurrencyDBHelper(this);
+        // Create an instance of the SQLiteDatabase
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        // Create a ContentValues class object
+        ContentValues values = new ContentValues();
+        for (Currency element: data) {
+
+            values.put(CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+            values.put(CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+            values.put(CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+            // Insert data into SQLiteDatabase
+            long newRowId = db.insert(CurrencyEntry.TABLE_NAME, null, values);
+            // Log data insertion to catch any errors
+            // TODO: Remove
+            Log.v("HomeActivity", "New row ID " + newRowId);
+
+        }
+
+        Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
+
+
+
 
     }
 
