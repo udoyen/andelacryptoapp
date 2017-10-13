@@ -9,19 +9,15 @@ public class Currency {
     private String cName;
     private long cEthValue;
     private long cBtcValue;
-    private int cImageResourceId;
 
-    Currency(String vName, long vEthValue, long vBtcValue, int vImageResourceId){
+
+    Currency(String vName, long vBtcValue, long vEthValue){
         cName = vName;
         cEthValue = vEthValue;
         cBtcValue = vBtcValue;
-        cImageResourceId = vImageResourceId;
+
     }
 
-
-    public int getcImageResourceId() {
-        return cImageResourceId;
-    }
 
     public String getcName() {
         return cName;

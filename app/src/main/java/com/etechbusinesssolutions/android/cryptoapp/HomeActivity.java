@@ -100,6 +100,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public void onLoadFinished(Loader<List<Currency>> loader, List<Currency> data) {
+        //TODO: Load the information from CryptocrrencyQueryUtils into database using content provider
         Log.i(LOG_TAG, "TEST: onLoadFinished() called ...");
 
     }
@@ -107,6 +108,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public void onLoaderReset(Loader<List<Currency>> loader) {
+        // TODO: FInish this
         Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
 
     }

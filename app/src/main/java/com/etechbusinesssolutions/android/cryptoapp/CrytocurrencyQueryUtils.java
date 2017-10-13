@@ -93,8 +93,7 @@ class CrytocurrencyQueryUtils {
                 long btcValue = btc.getLong(majorCur[i]);
 
                 // Create a new {@link Currency} object with the key, and value
-                //TODO: insert real image id values
-                Currency cur = new Currency(majorCur[i], ethValue, btcValue, 3);
+                Currency cur = new Currency(majorCur[i], ethValue, btcValue);
 
                 // Add the new {@link Currency} object to the list of currencies
                 cryptoValues.add(cur);

@@ -3,6 +3,7 @@ package com.etechbusinesssolutions.android.cryptoapp.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by george on 10/11/17.
@@ -31,6 +32,7 @@ class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
      * @param context of the app
      */
     public CryptoCurrencyDBHelper(Context context) {
+
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -40,6 +42,8 @@ class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
+
+        Log.i(LOG_TAG, "TEST: CrytoCurrencyDBHelper onCreate() called ...");
 
         // Create a String that contains the SQl statement to create the pets table
         String SQL_CREATE_CURRENCY_TABLE = "CREATE TABLE " + CryptoContract.CurrencyEntry.TABLE_NAME + " ("
