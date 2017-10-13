@@ -49,12 +49,12 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
         View rootView = inflater.inflate(R.layout.currency_base, container, false);
 
         // Create an empty ArrayList of currencies
-        final ArrayList<Currency> currency = new ArrayList<>();
+        final ArrayList<String> data = new ArrayList<>();
 
 
         // Create an {@link CurrencyAdapter}, whose data source is a list of {@link Currency}.
         // The adapter knows how to create the list items for each item in the list.
-        mAdapter= new CurrencyAdapter(getActivity(), currency);
+        mAdapter= new CurrencyAdapter(getActivity(), data);
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the

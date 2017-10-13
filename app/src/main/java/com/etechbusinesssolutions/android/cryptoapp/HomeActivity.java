@@ -108,7 +108,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public void onLoaderReset(Loader<List<Currency>> loader) {
-        // TODO: FInish this
+        // TODO: Finish this
         Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
 
     }
