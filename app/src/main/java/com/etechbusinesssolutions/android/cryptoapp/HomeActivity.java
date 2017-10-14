@@ -32,6 +32,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     // URL for the currency data from cryptocompare
     private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
 
+    //TODO: Something with this method
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
     /**
      * Constant value for the earthquake loader ID. We can choose any integer
      * This really comes into play when you're using multiple loaders

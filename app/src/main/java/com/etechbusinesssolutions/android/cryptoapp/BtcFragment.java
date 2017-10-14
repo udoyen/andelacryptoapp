@@ -1,5 +1,7 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.CurrencyEntry;
+import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +32,10 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
 
     // Adapter for the list of currencies values gotten from database
     private CurrencyAdapter mAdapter;
+
+
+    //Create an instance of CryptoCurrencyDBHelper
+    private CryptoCurrencyDBHelper mDBHelper;
 
 
     /**
@@ -81,7 +90,24 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<List<String>> onCreateLoader(int id, Bundle args) {
-        return null;
+        // Read data from database and send to onLoadFinished()
+
+        // Create instance of SQLiteDatabse class
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the
+        // database that will be used after this query
+        String[] projection = {
+                CurrencyEntry.COLUMN_CURRENCY_NAME,
+                CurrencyEntry.COLUMN_BTC_VALUE
+        };
+
+        // Query database
+        Cursor c = db.query(CurrencyEntry.TABLE_NAME, projection, null, null, null, null, null);
+
+
+
+        return new DatabaseLoader(this, c);
     }
 
     @Override
@@ -93,4 +119,6 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
     public void onLoaderReset(Loader<List<String>> loader) {
 
     }
+
+
 }
