@@ -7,17 +7,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
-import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.CurrencyEntry;
+import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,33 +54,33 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
 
         View rootView = inflater.inflate(R.layout.currency_base, container, false);
 
-        // Create an empty ArrayList of currencies
-        final ArrayList<String> data = new ArrayList<>();
-
-
-        // Create an {@link CurrencyAdapter}, whose data source is a list of {@link Currency}.
-        // The adapter knows how to create the list items for each item in the list.
-        mAdapter= new CurrencyAdapter(getActivity(), data);
-
-        // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
-        // There should be a {@link ListView} with the view ID called list, which is declared in the
-        // currency_base.xml layout file.
-        ListView listView = (ListView) rootView.findViewById(R.id.list);
-
-        // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
-        // {@link ListView} will display list items for each {@link Word} in the list.
-        listView.setAdapter(mAdapter);
-
-        //****LoadManager will load information****
-        // Get a reference to the loader manager in order to interact with loaders
-        Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
-        LoaderManager loaderManager = getLoaderManager();
-
-        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-        // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-        // because this activity implements the LoaderCallbacks interface).
-        Log.i(LOG_TAG, "TEST: Calling initloader()...");
-        loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+//        // Create an empty ArrayList of currencies
+//        final ArrayList<String> data = new ArrayList<>();
+//
+//
+//        // Create an {@link CurrencyAdapter}, whose data source is a list of {@link Currency}.
+//        // The adapter knows how to create the list items for each item in the list.
+//        mAdapter= new CurrencyAdapter(getActivity(), data);
+//
+//        // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
+//        // There should be a {@link ListView} with the view ID called list, which is declared in the
+//        // currency_base.xml layout file.
+//        ListView listView = (ListView) rootView.findViewById(R.id.list);
+//
+//        // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
+//        // {@link ListView} will display list items for each {@link Word} in the list.
+//        listView.setAdapter(mAdapter);
+//
+//        //****LoadManager will load information****
+//        // Get a reference to the loader manager in order to interact with loaders
+//        Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
+//        LoaderManager loaderManager = getLoaderManager();
+//
+//        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+//        // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+//        // because this activity implements the LoaderCallbacks interface).
+//        Log.i(LOG_TAG, "TEST: Calling initloader()...");
+//        loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
         return rootView;
     }
@@ -98,16 +95,16 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
         // Define a projection that specifies which columns from the
         // database that will be used after this query
         String[] projection = {
-                CurrencyEntry.COLUMN_CURRENCY_NAME,
-                CurrencyEntry.COLUMN_BTC_VALUE
+                CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME,
+                CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE
         };
 
         // Query database
-        Cursor c = db.query(CurrencyEntry.TABLE_NAME, projection, null, null, null, null, null);
+        Cursor c = db.query(CryptoContract.CurrencyEntry.TABLE_NAME, projection, null, null, null, null, null);
 
 
 
-        return new DatabaseLoader(this, c);
+        return null;
     }
 
     @Override
