@@ -14,11 +14,12 @@ import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
  * Created by george on 10/11/17.
  */
 
-public class CurrencyAdapter extends CursorAdapter {
+public class BtcCurrencyAdapter extends CursorAdapter {
 
     //TODO: Remove
-    private static final String LOG_TAG = CurrencyAdapter.class.getSimpleName();
-    public CurrencyAdapter(Context context, Cursor c, boolean autoRequery) {
+    private static final String LOG_TAG = BtcCurrencyAdapter.class.getSimpleName();
+
+    public BtcCurrencyAdapter(Context context, Cursor c, boolean autoRequery) {
         super(context, c, autoRequery);
     }
 
@@ -36,6 +37,7 @@ public class CurrencyAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
 
         // Find fields to populate in inflated template
+        //TODO: Remove redundant code
         TextView curCode = (TextView) view.findViewById(R.id.currency_code);
         TextView curValue = (TextView) view.findViewById(R.id.rate);
 

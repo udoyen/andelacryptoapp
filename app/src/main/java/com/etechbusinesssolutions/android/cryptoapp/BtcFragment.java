@@ -16,8 +16,6 @@ import android.widget.ListView;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.CurrencyEntry;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
-import java.net.URL;
-
 /**
  * Created by george on 10/10/17.
  */
@@ -29,13 +27,12 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
     public static final String LOG_TAG = BtcFragment.class.getName();
 
     // Adapter for the list of currencies values gotten from database
-    private CurrencyAdapter mAdapter;
+    private BtcCurrencyAdapter mAdapter;
 
 
     //TODO: Remove
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
-
 
     /**
      * Constant value for the github loader ID. We can choose any integer
@@ -43,11 +40,6 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
      */
     private static final int DATABASE_LOADER_ID = 2;
 
-    // Used to setup UrlQuery String
-    URL url = null;
-
-    // Cursor object
-    Cursor cursor;
 
     public BtcFragment() {
         // Required empty public constructor
@@ -63,12 +55,12 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // currency_base.xml layout file.
-        ListView listView = (ListView) rootView.findViewById(R.id.list);
+        ListView listView = rootView.findViewById(R.id.list);
         //TODO: Add an empty view for when no data exists
 
-        // Create an {@link CurrencyAdapter}, whose data source is a list of {@link Currency}.
+        // Create an {@link BtcCurrencyAdapter}, whose data source is a list of {@link Currency}.
         // The adapter knows how to create the list items for each item in the list.
-        mAdapter = new CurrencyAdapter(getContext(), null, false);
+        mAdapter = new BtcCurrencyAdapter(getContext(), null, false);
 
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
@@ -85,10 +77,6 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
         Log.i(LOG_TAG, "TEST: Calling initloader()...");
         loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
-
-
-
-        //getLoaderManager().initLoader(DATABASE_LOADER_ID, null, this);
 
         return rootView;
     }
