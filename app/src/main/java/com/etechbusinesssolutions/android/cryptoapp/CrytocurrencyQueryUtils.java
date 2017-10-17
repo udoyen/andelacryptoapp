@@ -87,10 +87,10 @@ public class CrytocurrencyQueryUtils {
 
                 //TODO: Tidy
                 //String ethCurrency = eth.keys().next();
-                long ethValue = eth.getLong(majorCur[i]);
+                double ethValue = eth.getDouble(majorCur[i]);
 
                 //String btcCurrency = btc.keys().next();
-                long btcValue = btc.getLong(majorCur[i]);
+                double btcValue = btc.getDouble(majorCur[i]);
 
                 // Create a new {@link Currency} object with the key, and value
                 Currency cur = new Currency(majorCur[i], ethValue, btcValue);

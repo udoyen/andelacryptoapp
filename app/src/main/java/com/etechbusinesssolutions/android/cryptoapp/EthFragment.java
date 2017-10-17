@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,27 +49,27 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
         // Create an {@link CurrencyAdapter}, whose data source is a list of {@link Currency}.
         // The adapter knows how to create the list items for each item in the list.
-        CurrencyAdapter adapter = new CurrencyAdapter(getActivity(), data);
+        //CurrencyAdapter adapter = new CurrencyAdapter(getActivity(), data);
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // currency_base.xml layout file.
-        ListView listView = (ListView) rootView.findViewById(R.id.list);
+        //ListView listView = (ListView) rootView.findViewById(R.id.list);
 
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
-        listView.setAdapter(adapter);
+        //listView.setAdapter(adapter);
 
         //****LoadManager will load information****
         // Get a reference to the loader manager in order to interact with loaders
         Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
-        LoaderManager loaderManager = getLoaderManager();
+        //LoaderManager loaderManager = getLoaderManager();
 
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
         // because this activity implements the LoaderCallbacks interface).
         Log.i(LOG_TAG, "TEST: Calling initloader()...");
-        loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+        //loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
         return rootView;
     }

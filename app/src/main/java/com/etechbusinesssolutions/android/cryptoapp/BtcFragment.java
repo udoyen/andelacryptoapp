@@ -1,11 +1,11 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,14 +17,12 @@ import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.Currency
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by george on 10/10/17.
  */
 
-public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallbacks<List<String>>{
+public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Used for logging
     //TODO: Remove
@@ -34,6 +32,7 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
     private CurrencyAdapter mAdapter;
 
 
+    //TODO: Remove
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
 
@@ -47,6 +46,9 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
     // Used to setup UrlQuery String
     URL url = null;
 
+    // Cursor object
+    Cursor cursor;
+
     public BtcFragment() {
         // Required empty public constructor
     }
@@ -57,18 +59,16 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
 
         View rootView = inflater.inflate(R.layout.currency_base, container, false);
 
-        // Create an empty ArrayList of currencies
-        final ArrayList<String> data = new ArrayList<>();
-
-
-        // Create an {@link CurrencyAdapter}, whose data source is a list of {@link Currency}.
-        // The adapter knows how to create the list items for each item in the list.
-        mAdapter= new CurrencyAdapter(getActivity(), data);
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // currency_base.xml layout file.
         ListView listView = (ListView) rootView.findViewById(R.id.list);
+        //TODO: Add an empty view for when no data exists
+
+        // Create an {@link CurrencyAdapter}, whose data source is a list of {@link Currency}.
+        // The adapter knows how to create the list items for each item in the list.
+        mAdapter = new CurrencyAdapter(getContext(), null, false);
 
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
@@ -85,40 +85,55 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
         Log.i(LOG_TAG, "TEST: Calling initloader()...");
         loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
+
+
+
+        //getLoaderManager().initLoader(DATABASE_LOADER_ID, null, this);
+
         return rootView;
     }
 
+
     @Override
-    public Loader<List<String>> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
         // Read data from database and send to onLoadFinished()
 
         // Create instance of SQLiteDatabse class
-        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+        //SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the
         // database that will be used after this query
         String[] projection = {
+                CurrencyEntry._ID,
                 CurrencyEntry.COLUMN_CURRENCY_NAME,
                 CurrencyEntry.COLUMN_BTC_VALUE
         };
 
-        // Query database
-        Cursor c = db.query(CurrencyEntry.TABLE_NAME, projection, null, null, null, null, null);
-
-
-
-        return new DatabaseLoader(this, c);
+        return new CursorLoader(getContext(),
+                CurrencyEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null
+                );
     }
 
     @Override
-    public void onLoadFinished(Loader<List<String>> loader, List<String> data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        //TODO: Send cursor information back to cursorAdapter
+        mAdapter.swapCursor(data);
+
 
     }
 
     @Override
-    public void onLoaderReset(Loader<List<String>> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        // Clears out the adapter's reference to the Cursor.
+        // This prevents memory leaks.
+        mAdapter.swapCursor(null);
 
     }
-
-
 }

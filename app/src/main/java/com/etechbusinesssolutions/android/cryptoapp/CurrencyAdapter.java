@@ -1,59 +1,57 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
-import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
 
 /**
  * Created by george on 10/11/17.
  */
 
-public class CurrencyAdapter extends ArrayAdapter<String> {
+public class CurrencyAdapter extends CursorAdapter {
 
     //TODO: Remove
     private static final String LOG_TAG = CurrencyAdapter.class.getSimpleName();
-
-
-    public CurrencyAdapter(Activity context, ArrayList<String> data) {
-
-        // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
-        // the second argument is used when the ArrayAdapter is populating a single TextView.
-        // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
-        // going to use this second argument, so it can be any value. Here, we used 0.
-
-        super(context, 0, data);
+    public CurrencyAdapter(Context context, Cursor c, boolean autoRequery) {
+        super(context, c, autoRequery);
     }
 
-    @NonNull
+    // The newView method id used to inflate a new view and return it,
+    // you don't bind any data to the view at this point.
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-        // Check if the existing view is being reused, else inflate the view
-        View listItemView = convertView;
-        if (listItemView == null ) {
+        return LayoutInflater.from(context).inflate(R.layout.currency_list_item, parent, false);
+    }
 
-            listItemView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.currency_list_item, parent, false
-            );
+    // The bindView methos is used to bind all data to a given view
+    // such as setting the text on a TextView.
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
 
-            // Get the  object located at this position in the list
-            getItem(position);
+        // Find fields to populate in inflated template
+        TextView curCode = (TextView) view.findViewById(R.id.currency_code);
+        TextView curValue = (TextView) view.findViewById(R.id.rate);
 
-            // Get the TextViews and set their values
-            TextView curCode = (TextView) listItemView.findViewById(R.id.currency_code);
+        // FInd the columns of currency index we want
+        int nameColumnIndex = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME);
+        int currencyValueIndex = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE);
 
 
-            // TODO: Work on this convertion
-            TextView curValue = (TextView) listItemView.findViewById(R.id.rate);
-            //curValue.setText(Long.toString(currentCurrency.getcValue()));
-        }
-        return super.getView(position, convertView, parent);
+        // Read the pet attribute from the Cursor for the current currency
+        double cValue = cursor.getDouble(currencyValueIndex);
+        String cName = cursor.getString(nameColumnIndex);
+
+        // Populate fields with extracted properties
+        curCode.setText(cName);
+        curValue.setText(String.valueOf(cValue));
+
+
     }
 }

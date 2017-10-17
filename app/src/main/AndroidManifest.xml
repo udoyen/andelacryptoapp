@@ -35,6 +35,10 @@
                 android:value=".HomeActivity"/>
 
         </activity>
+        <provider
+            android:authorities="com.etechbusinesssolutions.android.cryptoapp"
+            android:name=".data.CurrencyProvider"
+            android:exported="false" />
     </application>
 
 </manifest>

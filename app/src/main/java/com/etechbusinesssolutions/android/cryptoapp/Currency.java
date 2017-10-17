@@ -7,11 +7,11 @@ package com.etechbusinesssolutions.android.cryptoapp;
 public class Currency {
 
     private String cName;
-    private long cEthValue;
-    private long cBtcValue;
+    private double cEthValue;
+    private double cBtcValue;
 
 
-    Currency(String vName, long vBtcValue, long vEthValue){
+    Currency(String vName,  double vEthValue, double vBtcValue){
         cName = vName;
         cEthValue = vEthValue;
         cBtcValue = vBtcValue;
@@ -23,11 +23,11 @@ public class Currency {
         return cName;
     }
 
-    public long getcEthValue() {
+    public double getcEthValue() {
         return cEthValue;
     }
 
-    public long getcBtcValue() {
+    public double getcBtcValue() {
         return cBtcValue;
     }
 }

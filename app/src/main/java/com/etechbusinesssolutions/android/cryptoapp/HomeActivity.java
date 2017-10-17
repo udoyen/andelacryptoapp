@@ -135,6 +135,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
             // Log data insertion to catch any errors
             // TODO: Remove
             Log.v("HomeActivity", "New row ID " + newRowId);
+            Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
 
         }
 

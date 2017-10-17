@@ -13,6 +13,10 @@ public final class CryptoContract {
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
+    // Possible psth ( append to base content URI for possible URI's)
+    public static final String PATH_CURRENCY = "currency";
+
+
     // TO prevent accidental instantiation of this class,
     // give it an empty constructor
     private CryptoContract() {}
@@ -22,6 +26,10 @@ public final class CryptoContract {
      * Each entry in the table represents a single pet.
      */
     public static final class CurrencyEntry implements BaseColumns {
+
+        // THe content URI to access the currency data in the provider
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_CURRENCY);
+
 
         // Name of the database table
         public final static String TABLE_NAME = "rates";
