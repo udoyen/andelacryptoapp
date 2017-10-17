@@ -64,6 +64,7 @@ public final class CryptoContract {
         public final static String COLUMN_BTC_VALUE = "btc_value";
 
 
+
     }
 
 

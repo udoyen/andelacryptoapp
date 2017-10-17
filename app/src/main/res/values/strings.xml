@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CryptoApp</string>
+    <string name="currency_value">29304.99</string>
+    <string name="currency_symbol">NGN</string>
+    <string name="currency_logo">₦</string>
+
 </resources>

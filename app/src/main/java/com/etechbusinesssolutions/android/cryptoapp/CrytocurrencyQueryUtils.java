@@ -49,6 +49,8 @@ public class CrytocurrencyQueryUtils {
             "BRL"
     };
 
+
+
     /**
      * Create a private constructor because no one should ever create a {@link CrytocurrencyQueryUtils} object.
      * This class is only meant to hold static variables and methods, which can be accessed
@@ -105,7 +107,7 @@ public class CrytocurrencyQueryUtils {
             // If an error is thrown when executing any of the above statements in the "try" block,
             // catch the exception here, so the app doesn't crash. Print a log message
             // with the message from the exception.
-            Log.e("GithubQueryUtils", "Problem parsing the earthquake JSON results", e);
+            Log.e("CrytoCurrencyQueryUtils", "Problem parsing the cryptocompare API results", e);
         }
 
         // Return the list of currencies

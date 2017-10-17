@@ -9,6 +9,7 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
+import com.etechbusinesssolutions.android.cryptoapp.data.CurrencySymbol;
 
 /**
  * Created by george on 10/17/17.
@@ -18,6 +19,7 @@ public class EthCurrencyAdapter extends CursorAdapter {
 
     //TODO: Remove
     private static final String LOG_TAG = EthCurrencyAdapter.class.getSimpleName();
+
 
     public EthCurrencyAdapter(Context context, Cursor c, boolean autoRequery) {
         super(context, c, autoRequery);
@@ -38,8 +40,9 @@ public class EthCurrencyAdapter extends CursorAdapter {
 
         // Find fields to populate in inflated template
         //TODO: Remove redundant code
-        TextView curCode = (TextView) view.findViewById(R.id.currency_code);
-        TextView curValue = (TextView) view.findViewById(R.id.rate);
+        TextView curCode = view.findViewById(R.id.currency_code);
+        TextView curValue = view.findViewById(R.id.rate);
+        TextView curSymbol = view.findViewById(R.id.currency_symbol);
 
         // FInd the columns of currency index we want
         int nameColumnIndex = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME);
@@ -50,9 +53,14 @@ public class EthCurrencyAdapter extends CursorAdapter {
         double cValue = cursor.getDouble(currencyValueIndex);
         String cName = cursor.getString(nameColumnIndex);
 
+
         // Populate fields with extracted properties
         curCode.setText(cName);
         curValue.setText(String.valueOf(cValue));
+
+        // Set the symbol of the currency
+        // using the CurrencySymbol class static method getCurrencySymbol
+        curSymbol.setText(CurrencySymbol.getCurrencySymbol(cName));
 
 
     }

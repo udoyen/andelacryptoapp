@@ -11,10 +11,11 @@ public class Currency {
     private double cBtcValue;
 
 
-    Currency(String vName,  double vEthValue, double vBtcValue){
+    Currency(String vName, double vEthValue, double vBtcValue) {
         cName = vName;
         cEthValue = vEthValue;
         cBtcValue = vBtcValue;
+
 
     }
 
@@ -30,4 +31,6 @@ public class Currency {
     public double getcBtcValue() {
         return cBtcValue;
     }
+
+
 }

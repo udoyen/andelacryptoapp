@@ -17,7 +17,7 @@
         android:layout_gravity="center_vertical"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
-        android:text="CL"
+        android:text="@string/currency_logo"
         android:textColor="@android:color/black"
         android:textSize="26sp" />
 
@@ -29,7 +29,7 @@
         android:layout_gravity="center_vertical"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
-        android:text="29304.99"
+        android:text="@string/currency_value"
         android:textColor="@android:color/black"
         android:textSize="26sp" />
 
@@ -41,7 +41,7 @@
         android:layout_gravity="center_vertical"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
-        android:text="NGN"
+        android:text="@string/currency_symbol"
         android:textColor="@android:color/black"
         android:textSize="26sp" />
 
