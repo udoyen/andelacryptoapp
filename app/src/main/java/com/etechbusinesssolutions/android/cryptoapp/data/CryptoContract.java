@@ -36,7 +36,7 @@ public final class CryptoContract {
 
 
         /**
-         * Unique ID number for the eth (only for use in the database table).
+         * Unique ID number for the eth and btc (only for use in the database table).
          *
          * Type: INTEGER
          */

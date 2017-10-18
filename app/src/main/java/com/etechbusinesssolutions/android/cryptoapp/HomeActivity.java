@@ -147,12 +147,16 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
 
         for (Currency element : data) {
+            values.put(CryptoContract.CurrencyEntry._ID, element.getcId());
             values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
             values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
+            // data id for update
+            int id = element.getcId();
+
             // Update database
-            long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?", new String[]{String.valueOf(element.getcId())});
-            //long newRowId = db.updateWithOnConflict(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = " + element.getcId(), null, SQLiteDatabase.CONFLICT_REPLACE);
+            long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id=?", new String[]{String.valueOf(element.getcId())});
+            //long newRowId = db.updateWithOnConflict(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = " + id, null, SQLiteDatabase.CONFLICT_REPLACE);
             //long newRowId = db.replace(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
 
             // Log data insertion to catch any errors
@@ -162,6 +166,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         }
 
+        db.close();
 
         Log.i(LOG_TAG, "TEST: Database data update finished ...");
 
