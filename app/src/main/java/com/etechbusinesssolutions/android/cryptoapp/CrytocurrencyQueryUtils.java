@@ -10,12 +10,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import static com.etechbusinesssolutions.android.cryptoapp.BtcFragment.LOG_TAG;
 
@@ -156,7 +157,7 @@ public class CrytocurrencyQueryUtils {
     }
 
 
-    private static String makeHttpRequest(URL url) throws IOException {
+    private static String makeHttpsRequest(URL url) throws IOException {
 
         String jsonResponse = "";
 
@@ -165,12 +166,12 @@ public class CrytocurrencyQueryUtils {
             return jsonResponse;
         }
 
-        HttpURLConnection urlConnection = null;
+        HttpsURLConnection urlConnection = null;
         InputStream inputStream = null;
 
         try {
 
-            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setReadTimeout(10000 /* milliseconds */);
             urlConnection.setConnectTimeout(15000 /* milliseconds */);
             urlConnection.setRequestMethod("GET");
@@ -232,7 +233,7 @@ public class CrytocurrencyQueryUtils {
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
         try {
-            jsonResponse = makeHttpRequest(url);
+            jsonResponse = makeHttpsRequest(url);
             Log.i(LOG_TAG, "TEST: Url used to request data " + url);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);

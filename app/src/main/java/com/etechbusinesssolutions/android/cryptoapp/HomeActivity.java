@@ -5,6 +5,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Loader;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,7 +19,6 @@ import android.util.Log;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
-import java.io.File;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
@@ -32,21 +32,15 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
      * This really comes into play when you're using multiple loaders
      */
     private static final int CRYPTOCURRENCY_LOADER_ID = 1;
+
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
 
-    /**
-     * @param context The Activity in which this was run
-     * @param dbName  Name of database file.
-     * @return boolean value
-     */
-    private static boolean doesDatabaseExist(Context context, String dbName) {
+    SQLiteDatabase db;
 
-        File dbFile = context.getDatabasePath(dbName);
-        return dbFile.exists();
-    }
 
-    //TODO: Something with this method
+
+    //TODO: Do something with this method
     @Override
     protected void onStart() {
         super.onStart();
@@ -128,8 +122,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         mDBHelper = new CryptoCurrencyDBHelper(this);
 
 
-        SQLiteDatabase db;
-
         // Create a ContentValues class object
         ContentValues values = new ContentValues();
 
@@ -137,94 +129,60 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         // then update current records instead of inserting.
         Log.i(LOG_TAG, "Checking if database is present...");
 
-        //Cursor cur = db.rawQuery("SELECT COUNT(*) FROM " + CurrencyEntry.TABLE_NAME, null);
 
-        boolean found = HomeActivity.doesDatabaseExist(this, "currency.db");
+        boolean found = isTableExists("currency.db");
         Log.i(LOG_TAG, "Found: " + found + "...");
 
         // Create an instance of the SQLiteDatabase
         db = mDBHelper.getWritableDatabase();
 
 
-        for (Currency element : data) {
-            values.put(CryptoContract.CurrencyEntry._ID, element.getcId());
-            values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-            values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+        if (found) {
 
-            // data id for update
-            int id = element.getcId();
 
-            // Update database
-            long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id=?", new String[]{String.valueOf(element.getcId())});
-            //long newRowId = db.updateWithOnConflict(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = " + id, null, SQLiteDatabase.CONFLICT_REPLACE);
-            //long newRowId = db.replace(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
+            for (Currency element : data) {
+                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-            // Log data insertion to catch any errors
-            // TODO: Remove
-            Log.v("HomeActivity db update", "New row ID " + newRowId + " Element id " + element.getcId());
-            Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+                // Update database
+                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?", new String[]{String.valueOf(element.getcId())});
+
+                // Log data insertion to catch any errors
+                // TODO: Remove
+                Log.v("HomeActivity db update", "New row ID " + newRowId + " Element id " + element.getcId());
+                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+
+            }
+
+
+            Log.i(LOG_TAG, "TEST: Database data update finished ...");
+
+            db.close();
+
+
+        } else {
+
+            for (Currency element : data) {
+
+                values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+                // Insert data into SQLiteDatabase
+                long newRowId = db.insert(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
+                // Log data insertion to catch any errors
+                // TODO: Remove
+                Log.v("HomeActivity", "New row ID " + newRowId);
+                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+
+            }
+
+            Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
+
+            db.close();
+
 
         }
-
-        db.close();
-
-        Log.i(LOG_TAG, "TEST: Database data update finished ...");
-
-
-//        if (found) {
-//
-//            // Create an instance of the SQLiteDatabase
-//            db = mDBHelper.getWritableDatabase();
-//
-//
-//            for (Currency element : data) {
-//                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-//                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
-//
-//                // Update database
-//                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?", new String[]{String.valueOf(element.getcId())});
-//                //long newRowId = db.updateWithOnConflict(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = " + element.getcId(), null, SQLiteDatabase.CONFLICT_REPLACE);
-//                //long newRowId = db.replace(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
-//
-//                // Log data insertion to catch any errors
-//                // TODO: Remove
-//                Log.v("HomeActivity db update", "New row ID " + newRowId + " Element id " + element.getcId());
-//                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
-//
-//            }
-//
-//
-//            Log.i(LOG_TAG, "TEST: Database data update finished ...");
-//
-//            db.close();
-//
-//
-//        } else {
-//
-//            // Create an instance of the SQLiteDatabase
-//            db = mDBHelper.getWritableDatabase();
-//
-//            for (Currency element : data) {
-//
-//                values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-//                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-//                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
-//
-//                // Insert data into SQLiteDatabase
-//                long newRowId = db.insert(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
-//                // Log data insertion to catch any errors
-//                // TODO: Remove
-//                Log.v("HomeActivity", "New row ID " + newRowId);
-//                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
-//
-//            }
-//
-//            Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
-//
-//            db.close();
-//
-//
-//        }
 
 
     }
@@ -236,5 +194,22 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     }
 
+    /**
+     * @param tableName Name of database table
+     * @return true
+     */
+    public boolean isTableExists(String tableName) {
 
+        SQLiteDatabase test = mDBHelper.getReadableDatabase();
+
+        Cursor cursor = test.rawQuery("SELECT * FROM " + CryptoContract.CurrencyEntry.TABLE_NAME, null);
+
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        test.close();
+
+        return exists;
+
+
+    }
 }

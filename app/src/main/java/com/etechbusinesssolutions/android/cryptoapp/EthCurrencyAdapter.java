@@ -63,5 +63,6 @@ public class EthCurrencyAdapter extends CursorAdapter {
         curSymbol.setText(CurrencySymbol.getCurrencySymbol(cName));
 
 
+
     }
 }

@@ -83,11 +83,6 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        // Read data from database and send to onLoadFinished()
-
-        // Create instance of SQLiteDatabse class
-        //SQLiteDatabase db = mDBHelper.getReadableDatabase();
-
         // Define a projection that specifies which columns from the
         // database that will be used after this query
         String[] projection = {

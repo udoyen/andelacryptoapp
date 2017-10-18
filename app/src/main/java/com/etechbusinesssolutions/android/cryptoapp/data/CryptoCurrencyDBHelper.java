@@ -54,6 +54,7 @@ public class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
 
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_CURRENCY_TABLE);
+        //db.close();
 
     }
 
@@ -70,6 +71,7 @@ public class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
         // This is only a cache
         db.execSQL(SQL_DELETE_ENTRIES);
         onCreate(db);
+        //db.close();
 
     }
 
