@@ -74,6 +74,12 @@ public class CurrencyProvider extends ContentProvider {
                     throw new IllegalArgumentException("Cannot query unknown URI " + uri);
 
         }
+
+        // Set notification URI on the Cursor,
+        // so we know what content URI the cursor was created for.
+        // If the data at this URI changes, then we need to update the Cursor.
+        //TODO: Fix this to watch for null situation
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 

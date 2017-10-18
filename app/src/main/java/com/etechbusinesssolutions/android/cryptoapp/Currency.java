@@ -9,12 +9,14 @@ public class Currency {
     private String cName;
     private double cEthValue;
     private double cBtcValue;
+    private int cId;
 
 
-    Currency(String vName, double vEthValue, double vBtcValue) {
+    Currency(String vName, double vEthValue, double vBtcValue, int vId) {
         cName = vName;
         cEthValue = vEthValue;
         cBtcValue = vBtcValue;
+        cId = vId;
 
 
     }
@@ -33,4 +35,7 @@ public class Currency {
     }
 
 
+    public int getcId() {
+        return cId;
+    }
 }

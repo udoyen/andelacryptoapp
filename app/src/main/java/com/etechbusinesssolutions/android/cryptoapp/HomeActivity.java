@@ -15,34 +15,42 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
+import java.io.File;
 import java.util.List;
-
-import static com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.CurrencyEntry;
 
 public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
 
     //TODO: Remove
     public static final String LOG_TAG = HomeActivity.class.getSimpleName();
-
+    // URL for the currency data from cryptocompare
+    private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
+    /**
+     * Constant value for the earthquake loader ID. We can choose any integer
+     * This really comes into play when you're using multiple loaders
+     */
+    private static final int CRYPTOCURRENCY_LOADER_ID = 1;
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
 
-    // URL for the currency data from cryptocompare
-    private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
+    /**
+     * @param context The Activity in which this was run
+     * @param dbName  Name of database file.
+     * @return boolean value
+     */
+    private static boolean doesDatabaseExist(Context context, String dbName) {
+
+        File dbFile = context.getDatabasePath(dbName);
+        return dbFile.exists();
+    }
 
     //TODO: Something with this method
     @Override
     protected void onStart() {
         super.onStart();
     }
-
-    /**
-     * Constant value for the earthquake loader ID. We can choose any integer
-     * This really comes into play when you're using multiple loaders
-     */
-    private static final int CRYPTOCURRENCY_LOADER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +84,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
 
 
-        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()){
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
 
             // Get a reference to the loader manager in order to interact with loaders
             Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
@@ -91,9 +99,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         }
 
 
-
     }
-
 
     @Override
     public Loader<List<Currency>> onCreateLoader(int id, Bundle args) {
@@ -120,32 +126,103 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         Log.i(LOG_TAG, "TEST: Database data insertion started ...");
         //Instantiate the CryptoCurrencyDBHelper
         mDBHelper = new CryptoCurrencyDBHelper(this);
-        // Create an instance of the SQLiteDatabase
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+
+
+        SQLiteDatabase db;
+
         // Create a ContentValues class object
         ContentValues values = new ContentValues();
-        for (Currency element: data) {
 
-            values.put(CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-            values.put(CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-            values.put(CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+        // Check if database table already present, if it exists
+        // then update current records instead of inserting.
+        Log.i(LOG_TAG, "Checking if database is present...");
 
-            // Insert data into SQLiteDatabase
-            long newRowId = db.insert(CurrencyEntry.TABLE_NAME, null, values);
+        //Cursor cur = db.rawQuery("SELECT COUNT(*) FROM " + CurrencyEntry.TABLE_NAME, null);
+
+        boolean found = HomeActivity.doesDatabaseExist(this, "currency.db");
+        Log.i(LOG_TAG, "Found: " + found + "...");
+
+        // Create an instance of the SQLiteDatabase
+        db = mDBHelper.getWritableDatabase();
+
+
+        for (Currency element : data) {
+            values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+            values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+            // Update database
+            long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?", new String[]{String.valueOf(element.getcId())});
+            //long newRowId = db.updateWithOnConflict(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = " + element.getcId(), null, SQLiteDatabase.CONFLICT_REPLACE);
+            //long newRowId = db.replace(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
+
             // Log data insertion to catch any errors
             // TODO: Remove
-            Log.v("HomeActivity", "New row ID " + newRowId);
+            Log.v("HomeActivity db update", "New row ID " + newRowId + " Element id " + element.getcId());
             Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
 
         }
 
-        Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
+
+        Log.i(LOG_TAG, "TEST: Database data update finished ...");
 
 
+//        if (found) {
+//
+//            // Create an instance of the SQLiteDatabase
+//            db = mDBHelper.getWritableDatabase();
+//
+//
+//            for (Currency element : data) {
+//                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+//                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+//
+//                // Update database
+//                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?", new String[]{String.valueOf(element.getcId())});
+//                //long newRowId = db.updateWithOnConflict(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = " + element.getcId(), null, SQLiteDatabase.CONFLICT_REPLACE);
+//                //long newRowId = db.replace(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
+//
+//                // Log data insertion to catch any errors
+//                // TODO: Remove
+//                Log.v("HomeActivity db update", "New row ID " + newRowId + " Element id " + element.getcId());
+//                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+//
+//            }
+//
+//
+//            Log.i(LOG_TAG, "TEST: Database data update finished ...");
+//
+//            db.close();
+//
+//
+//        } else {
+//
+//            // Create an instance of the SQLiteDatabase
+//            db = mDBHelper.getWritableDatabase();
+//
+//            for (Currency element : data) {
+//
+//                values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+//                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+//                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+//
+//                // Insert data into SQLiteDatabase
+//                long newRowId = db.insert(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
+//                // Log data insertion to catch any errors
+//                // TODO: Remove
+//                Log.v("HomeActivity", "New row ID " + newRowId);
+//                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+//
+//            }
+//
+//            Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
+//
+//            db.close();
+//
+//
+//        }
 
 
     }
-
 
     @Override
     public void onLoaderReset(Loader<List<Currency>> loader) {
@@ -153,4 +230,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
 
     }
+
+
 }

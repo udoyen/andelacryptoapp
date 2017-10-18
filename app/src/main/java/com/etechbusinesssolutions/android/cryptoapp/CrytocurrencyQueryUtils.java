@@ -49,6 +49,31 @@ public class CrytocurrencyQueryUtils {
             "BRL"
     };
 
+    // int array used to access the update database
+    private static int[] virtualId = {
+
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+    };
+
 
 
     /**
@@ -94,8 +119,9 @@ public class CrytocurrencyQueryUtils {
                 //String btcCurrency = btc.keys().next();
                 double btcValue = btc.getDouble(majorCur[i]);
 
+
                 // Create a new {@link Currency} object with the key, and value
-                Currency cur = new Currency(majorCur[i], ethValue, btcValue);
+                Currency cur = new Currency(majorCur[i], ethValue, btcValue, virtualId[i]);
 
                 // Add the new {@link Currency} object to the list of currencies
                 cryptoValues.add(cur);

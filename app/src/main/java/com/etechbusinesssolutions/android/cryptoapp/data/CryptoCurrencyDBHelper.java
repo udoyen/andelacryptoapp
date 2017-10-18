@@ -24,7 +24,7 @@ public class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
     /**
      * Database version. If you change the database schema, you must increment the database version.
      */
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 2;
 
     /**
      * Constructs a new instance of {@link CryptoCurrencyDBHelper}.
