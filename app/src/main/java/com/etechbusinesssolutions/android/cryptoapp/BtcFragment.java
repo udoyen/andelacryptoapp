@@ -72,10 +72,6 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //TODO: Remove if not needed
-                //Get the current currency that was clicked
-                //Currency currency = (Currency) mAdapter.getItem(position);
-
                 // Create new intent to view CardView
                 Intent cardViewIntent = new Intent(rootView.getContext(), CardActivity.class);
 
@@ -91,12 +87,14 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
 
         //****LoadManager will load information****
         // Get a reference to the loader manager in order to interact with loaders
+        //TODO: Remove
         Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
         LoaderManager loaderManager = getLoaderManager();
 
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
         // because this activity implements the LoaderCallbacks interface).
+        //TODO: Remove
         Log.i(LOG_TAG, "TEST: Calling initloader()...");
         loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
