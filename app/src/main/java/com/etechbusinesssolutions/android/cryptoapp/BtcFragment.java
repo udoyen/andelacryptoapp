@@ -1,5 +1,6 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,8 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.etechbusinesssolutions.android.cryptoapp.cardview.CardActivity;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.CurrencyEntry;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
@@ -49,7 +52,7 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.currency_base, container, false);
+        final View rootView = inflater.inflate(R.layout.currency_base, container, false);
 
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
@@ -65,6 +68,24 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
         listView.setAdapter(mAdapter);
+
+        // Respond to click event on user item
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                //TODO: Remove if not needed
+                //Get the current currency that was clicked
+                //Currency currency = (Currency) mAdapter.getItem(position);
+
+                // Create new intent to view CardView
+                Intent cardViewIntent = new Intent(rootView.getContext(), CardActivity.class);
+
+                startActivity(cardViewIntent);
+
+
+            }
+        });
 
         //****LoadManager will load information****
         // Get a reference to the loader manager in order to interact with loaders

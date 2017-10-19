@@ -19,26 +19,35 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BtcActivity" android:label="BTC Rates"
+        <activity
+            android:name=".BtcActivity"
+            android:label="BTC Rates"
             android:parentActivityName=".HomeActivity">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".HomeActivity"/>
+                android:value=".HomeActivity" />
         </activity>
-
-        <activity android:name=".EthActivity" android:parentActivityName=".HomeActivity"
-            android:label="ETH Rates">
-
+        <activity
+            android:name=".EthActivity"
+            android:label="ETH Rates"
+            android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".HomeActivity"/>
-
+                android:value=".HomeActivity" />
         </activity>
+
         <provider
-            android:authorities="com.etechbusinesssolutions.android.cryptoapp"
             android:name=".data.CurrencyProvider"
+            android:authorities="com.etechbusinesssolutions.android.cryptoapp"
             android:exported="false" />
+
+        <activity android:name=".cardview.CardActivity"
+            android:label="Card View"
+            android:parentActivityName=".HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+        </activity>
     </application>
 
 </manifest>
