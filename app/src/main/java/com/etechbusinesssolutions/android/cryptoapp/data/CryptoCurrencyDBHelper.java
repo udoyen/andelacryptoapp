@@ -1,9 +1,13 @@
 package com.etechbusinesssolutions.android.cryptoapp.data;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by george on 10/11/17.
@@ -37,7 +41,6 @@ public class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     *
      * @param db
      */
     @Override
@@ -61,6 +64,7 @@ public class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
 
     /**
      * This is called when the databse must be updated
+     *
      * @param db
      * @param oldVersion
      * @param newVersion
@@ -78,6 +82,65 @@ public class CryptoCurrencyDBHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         super.onDowngrade(db, oldVersion, newVersion);
+    }
+
+    /**
+     * @return Code names of currencies for Spinner
+     */
+    public List<String> getAllCurrencyCodeNames() {
+
+        List<String> codes = new ArrayList<>();
+
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + CryptoContract.CurrencyEntry.TABLE_NAME;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // Add the currency code to the list
+        if (cursor.moveToFirst()) {
+            do {
+                codes.add(cursor.getString(1));
+            } while (cursor.moveToNext());
+        }
+
+        // CLoser connection
+        cursor.close();
+        db.close();
+
+        return codes;
+    }
+
+    /**
+     * @param cur_name      The currency code
+     * @param crypt_version The crypto currency version
+     * @return Return string value from database
+     */
+    public String getCurrencyValue(String cur_name, String crypt_version) {
+
+        Log.i(LOG_TAG, "getCurrencyValue() called ...");
+
+        // Select value query
+        String selectValueQuery = "SELECT " + crypt_version + " FROM "
+                + CryptoContract.CurrencyEntry.TABLE_NAME
+                + " WHERE cur_name=" + "'" + cur_name + "'";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectValueQuery, null);
+
+        String value = null;
+
+        //Get the database value
+        if (cursor.moveToFirst()) {
+
+            value = String.valueOf(cursor.getDouble(cursor.getColumnIndex(crypt_version)));
+        }
+
+        // Closer connection
+        cursor.close();
+        db.close();
+
+        return value;
     }
 
 }

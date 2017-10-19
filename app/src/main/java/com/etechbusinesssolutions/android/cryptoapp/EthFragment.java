@@ -28,20 +28,18 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
     // Used for logging
     //TODO: Remove
     public static final String LOG_TAG = EthFragment.class.getName();
-
-    // Adapter for the list of currencies values gotten from database
-    private EthCurrencyAdapter mAdapter;
-
-
-    //TODO: Remove
-    //Create an instance of CryptoCurrencyDBHelper
-    private CryptoCurrencyDBHelper mDBHelper;
-
     /**
      * Constant value for the github loader ID. We can choose any integer
      * This really comes into play when you're using multiple loaders
      */
     private static final int DATABASE_LOADER_ID = 3;
+    // String to identify intent source
+    private static final String ETH_CODE = "eth_value";
+    // Adapter for the list of currencies values gotten from database
+    private EthCurrencyAdapter mAdapter;
+    //TODO: Remove
+    //Create an instance of CryptoCurrencyDBHelper
+    private CryptoCurrencyDBHelper mDBHelper;
 
 
     public EthFragment() {
@@ -81,6 +79,9 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
                 // Create new intent to view CardView
                 Intent cardViewIntent = new Intent(rootView.getContext(), CardActivity.class);
+
+                // Send the "eth_value" to CardView so the right database columns will be accessed
+                cardViewIntent.putExtra("CURRENCY_CODE", ETH_CODE);
 
                 startActivity(cardViewIntent);
 

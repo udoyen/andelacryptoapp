@@ -39,12 +39,11 @@ public class BtcCurrencyAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
 
         // Find fields to populate in inflated template
-        //TODO: Remove redundant code
         TextView curCode = view.findViewById(R.id.currency_code);
         TextView curValue = view.findViewById(R.id.rate);
         TextView curSymbol = view.findViewById(R.id.currency_symbol);
 
-        // FInd the columns of currency index we want
+        // Find the columns of currency index we want
         int nameColumnIndex = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME);
         int currencyValueIndex = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE);
 

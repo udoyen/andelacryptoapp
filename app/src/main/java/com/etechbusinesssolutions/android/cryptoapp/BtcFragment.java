@@ -23,25 +23,23 @@ import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
  * Created by george on 10/10/17.
  */
 
-public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Used for logging
     //TODO: Remove
     public static final String LOG_TAG = BtcFragment.class.getName();
-
-    // Adapter for the list of currencies values gotten from database
-    private BtcCurrencyAdapter mAdapter;
-
-
-    //TODO: Remove
-    //Create an instance of CryptoCurrencyDBHelper
-    private CryptoCurrencyDBHelper mDBHelper;
-
     /**
      * Constant value for the github loader ID. We can choose any integer
      * This really comes into play when you're using multiple loaders
      */
     private static final int DATABASE_LOADER_ID = 2;
+    // String to identify intent source
+    private static final String BTC_CODE = "btc_value";
+    // Adapter for the list of currencies values gotten from database
+    private BtcCurrencyAdapter mAdapter;
+    //TODO: Remove
+    //Create an instance of CryptoCurrencyDBHelper
+    private CryptoCurrencyDBHelper mDBHelper;
 
 
     public BtcFragment() {
@@ -80,6 +78,10 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
 
                 // Create new intent to view CardView
                 Intent cardViewIntent = new Intent(rootView.getContext(), CardActivity.class);
+
+
+                // Send the "eth_value" to CardView so the right database columns will be accessed
+                cardViewIntent.putExtra("CURRENCY_CODE", BTC_CODE);
 
                 startActivity(cardViewIntent);
 
@@ -120,7 +122,7 @@ public class BtcFragment extends Fragment  implements LoaderManager.LoaderCallba
                 null,
                 null,
                 null
-                );
+        );
     }
 
     @Override
