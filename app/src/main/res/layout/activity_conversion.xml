@@ -133,10 +133,14 @@
                 </LinearLayout>
 
                 <Button
-                    android:layout_width="wrap_content"
+                    android:id="@+id/convertBtn"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Convert"
-                    android:textAlignment="center"/>
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/linear_box_borders"
+                    android:onClick="onConvertBtnClick"
+                    android:text="@string/convert_btn_text"
+                    android:textAlignment="center" />
 
 
             </LinearLayout>

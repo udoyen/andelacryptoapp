@@ -1,6 +1,5 @@
 package com.etechbusinesssolutions.android.cryptoapp.conversion;
 
-import android.icu.text.DecimalFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -13,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.etechbusinesssolutions.android.cryptoapp.R;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
+import java.text.DecimalFormat;
 import java.util.IllegalFormatException;
 import java.util.List;
 
@@ -39,66 +40,42 @@ public class ConversionActivity extends AppCompatActivity {
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
 
+    //Used to determine if user has entered a number
+    // default is false.
+    boolean editBoxWithText = false;
+
+    // Create EditText object
+    EditText value1;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversion);
 
-        // Grab the TextViews to update when the user
-        final TextView resultTextView = (TextView) findViewById(R.id.conversion_value);
+        value1 = (EditText) findViewById(R.id.value_to_convert_box);
 
-        // Grab the user input from EditText box
-        final EditText value = (EditText) findViewById(R.id.value_to_convert_box);
-
-
-        // Convert user entered
-        value.addTextChangedListener(new TextWatcher() {
+        value1.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                try {
-                    //TODO: Remove
-                    Log.i(LOG_TAG, "onTextextChanged() called ...");
-                    // Grab user input.
-                    userInput = Double.parseDouble(value.getText().toString());
-
-                    //Set the Conversion Result TextView
-                    resultTextView.setText(conversion(userInput));
-
-                } catch (NumberFormatException e) {
-
-                    // Show user the error
-                    Toast.makeText(ConversionActivity.this, "Please enter only numbers into box!", Toast.LENGTH_LONG).show();
-                }
-
+                // Set this to true on user entering
+                // a number
+                editBoxWithText = true;
 
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void afterTextChanged(Editable s) {
 
-                try {
-                    //TODO: Remove
-                    Log.i(LOG_TAG, "afterTextChanged() called ...");
-
-                    // Grab user input.
-                    userInput = Double.parseDouble(value.getText().toString());
-
-                    //Set the Conversion Result TextView
-                    resultTextView.setText(conversion(userInput));
-
-                } catch (NumberFormatException e) {
-
-                    // Show user the error
-                    Toast.makeText(ConversionActivity.this, "Please enter only numbers into box!", Toast.LENGTH_LONG).show();
-                }
+                // Set this to true on user entering
+                // a number
+                editBoxWithText = true;
 
             }
         });
@@ -110,12 +87,18 @@ public class ConversionActivity extends AppCompatActivity {
 
         // Spinner listener
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // Get the item that was selected or clicked
                 code = parent.getItemAtPosition(position).toString();
                 //TODO: Remove
                 Log.i(LOG_TAG, "Conversion Spinner selected code is: " + code);
+                //TODO: Remove
+                if (editBoxWithText) {
+                    Log.i(LOG_TAG, "conversion() called from Spinner object");
+                    conversion();
+                }
 
 
             }
@@ -124,6 +107,8 @@ public class ConversionActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
+
+
         });
 
         // Load the spinner data from database
@@ -157,7 +142,9 @@ public class ConversionActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void onRadioButtonClicked(View view) {
+        Log.i(LOG_TAG, "Inside onRadioClicked() method ...");
 
         final TextView currencyLogo = (TextView) findViewById(R.id.conversion_currency_logo);
 
@@ -174,6 +161,12 @@ public class ConversionActivity extends AppCompatActivity {
                 // Set the currency logo text and make it visible
                 currencyLogo.setText(R.string.conversion_radio_btc_btn);
                 currencyLogo.setVisibility(View.VISIBLE);
+                if (editBoxWithText) {
+                    //TODO: Remove
+                    Log.i(LOG_TAG, "conversion() called from btc radio button click");
+                    conversion();
+                }
+
                 // TODO: Remove
                 Log.i(LOG_TAG, "radioBtnState: " + radioBtnState);
                 break;
@@ -185,6 +178,11 @@ public class ConversionActivity extends AppCompatActivity {
                 // Set the currency logo text and make it visible
                 currencyLogo.setText(R.string.conversion_radio_eth_btn);
                 currencyLogo.setVisibility(View.VISIBLE);
+                if (editBoxWithText) {
+                    //TODO: Remove
+                    Log.i(LOG_TAG, "conversion() called from btc radio button click");
+                    conversion();
+                }
                 // TODO: Remove
                 Log.i(LOG_TAG, "radioBtnState: " + radioBtnState);
                 break;
@@ -194,18 +192,49 @@ public class ConversionActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public String conversion(double userInput) {
+    public void conversion() {
 
-        String result = null;
+        // Calculation result
+        double cal;
+
+        // Create a radio button object
+        RadioGroup rBtn = (RadioGroup) findViewById(R.id.radio_container);
+        int checked = rBtn.getCheckedRadioButtonId();
+        //TODO: Remove
+        Log.i(LOG_TAG, "Is radio button checked: " + checked);
+
+        // Grab the user input from EditText box
+        EditText value1 = (EditText) findViewById(R.id.value_to_convert_box);
+        //TODO: Remove
+        Log.i(LOG_TAG, "EditTex grabbed ...");
+
+        // Grab the TextViews to update
+        TextView resultTextView = (TextView) findViewById(R.id.conversion_value);
+        //TODO: Remove
+        Log.i(LOG_TAG, "Result textview grabbed ...");
+
+        //Checked to make sure user input isn't empty
+        if (value1.getText().toString().trim().length() > 0) {
+
+            // Grab user input.
+            userInput = Double.parseDouble(value1.getText().toString().trim());
+            //TODO: Remove
+            Log.i(LOG_TAG, "Converting user input to double for user in conversion ...");
+
+        } else {
+
+            Toast.makeText(getApplicationContext(), "Please enter a value in the number box", Toast.LENGTH_LONG).show();
+
+        }
+
+        String result;
 
         // Check if user has selected a crypto currency type
-        if (radioBtnState == null) {
+        if (radioBtnState == null || checked == -1) {
 
             Toast.makeText(ConversionActivity.this,
                     "Please select a crypto currency type to convert to!",
                     Toast.LENGTH_LONG).show();
-
-            return "0";
 
         } else {
 
@@ -219,13 +248,19 @@ public class ConversionActivity extends AppCompatActivity {
                 //TODO: Remove
                 Log.i(LOG_TAG, "Database value: " + value);
 
+
                 // Calculate the conversion rate
-                double cal = userInput / value;
+                cal = userInput / value;
+
 
                 result = String.valueOf(Double.valueOf(df.format(cal)));
 
+
                 //TODO: Remove
                 Log.i(LOG_TAG, "Result of the conversion: " + result);
+
+                //Set the Conversion Result TextView
+                resultTextView.setText(result);
 
 
             } catch (NumberFormatException e) {
@@ -238,9 +273,21 @@ public class ConversionActivity extends AppCompatActivity {
                 Log.i(LOG_TAG, "Error: " + g);
             }
 
-            return result;
 
         }
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void onConvertBtnClick(View view) {
+
+        // Call the conversion method
+        //TODO: Remove
+        Log.i(LOG_TAG, "onConvertBtnClick() called ...");
+        conversion();
+        //TODO: Remove
+        Log.i(LOG_TAG, "conversion() called from Convert button click...");
+
 
     }
 }

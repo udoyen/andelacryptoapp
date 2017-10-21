@@ -7,5 +7,6 @@
     <string name="conversion_radio_btc_btn">BTC</string>
     <string name="conversion_btc_logo">BTC</string>
     <string name="default_conversion_result_value">0</string>
+    <string name="convert_btn_text">Convert</string>
 
 </resources>
