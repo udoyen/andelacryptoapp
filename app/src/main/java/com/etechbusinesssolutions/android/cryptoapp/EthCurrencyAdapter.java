@@ -9,7 +9,9 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
-import com.etechbusinesssolutions.android.cryptoapp.data.CurrencySymbol;
+import com.etechbusinesssolutions.android.cryptoapp.data.CurrencyHelper;
+
+import java.text.DecimalFormat;
 
 /**
  * Created by george on 10/17/17.
@@ -20,6 +22,10 @@ public class EthCurrencyAdapter extends CursorAdapter {
     //TODO: Remove
     private static final String LOG_TAG = EthCurrencyAdapter.class.getSimpleName();
 
+    /**
+     * Format to use for displaying currencies
+     */
+    private DecimalFormat df = new DecimalFormat("#,###.###");
 
     public EthCurrencyAdapter(Context context, Cursor c, boolean autoRequery) {
         super(context, c, autoRequery);
@@ -56,11 +62,11 @@ public class EthCurrencyAdapter extends CursorAdapter {
 
         // Populate fields with extracted properties
         curCode.setText(cName);
-        curValue.setText(String.valueOf(cValue));
+        curValue.setText(df.format(cValue));
 
         // Set the symbol of the currency
-        // using the CurrencySymbol class static method getCurrencySymbol
-        curSymbol.setText(CurrencySymbol.getCurrencySymbol(cName));
+        // using the CurrencyHelper class static method getCurrencySymbol
+        curSymbol.setText(CurrencyHelper.getCurrencySymbol(cName));
 
 
 

@@ -18,8 +18,9 @@ import android.widget.Toast;
 import com.etechbusinesssolutions.android.cryptoapp.R;
 import com.etechbusinesssolutions.android.cryptoapp.conversion.ConversionActivity;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
-import com.etechbusinesssolutions.android.cryptoapp.data.CurrencySymbol;
+import com.etechbusinesssolutions.android.cryptoapp.data.CurrencyHelper;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class CardActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -57,6 +58,11 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter mPagerAdapter;
+
+    /**
+     * Format to use for displayed currencies
+     */
+    DecimalFormat df = new DecimalFormat("#,###.###");
 
 
 
@@ -164,8 +170,9 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                 Log.i(LOG_TAG, "Calling value from database in eth if block ...");
 
                 String value = mDBHelper.getCurrencyValue(code, ETH_CODE);
-                curValue.setText(value);
-                logoText.setText(CurrencySymbol.getCurrencySymbol(code));
+                double num = Double.parseDouble(value);
+                curValue.setText(df.format(num));
+                logoText.setText(CurrencyHelper.getCurrencySymbol(code));
 
             }
             if (currency_code.equals(BTC_CODE)) {
@@ -174,8 +181,9 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                 Log.i(LOG_TAG, "Calling value from database in eth if block ...");
 
                 String value = mDBHelper.getCurrencyValue(code, BTC_CODE);
-                curValue.setText(value);
-                logoText.setText(CurrencySymbol.getCurrencySymbol(code));
+                double num = Double.parseDouble(value);
+                curValue.setText(df.format(num));
+                logoText.setText(CurrencyHelper.getCurrencySymbol(code));
 
             }
         }

@@ -9,13 +9,20 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
-import com.etechbusinesssolutions.android.cryptoapp.data.CurrencySymbol;
+import com.etechbusinesssolutions.android.cryptoapp.data.CurrencyHelper;
+
+import java.text.DecimalFormat;
 
 /**
  * Created by george on 10/11/17.
  */
 
 public class BtcCurrencyAdapter extends CursorAdapter {
+
+    /**
+     * Format to use for displaying currencies
+     */
+    private DecimalFormat df = new DecimalFormat("#,###.###");
 
     //TODO: Remove
     private static final String LOG_TAG = BtcCurrencyAdapter.class.getSimpleName();
@@ -54,11 +61,11 @@ public class BtcCurrencyAdapter extends CursorAdapter {
 
         // Populate fields with extracted properties
         curCode.setText(cName);
-        curValue.setText(String.valueOf(cValue));
+        curValue.setText(df.format(cValue));
 
         // Set the symbol of the currency
-        // using the CurrencySymbol class static method getCurrencySymbol
-        curSymbol.setText(CurrencySymbol.getCurrencySymbol(cName));
+        // using the CurrencyHelper class static method getCurrencySymbol
+        curSymbol.setText(CurrencyHelper.getCurrencySymbol(cName));
 
 
 

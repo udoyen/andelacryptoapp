@@ -5,7 +5,7 @@ package com.etechbusinesssolutions.android.cryptoapp.data;
  * Class used to get the currency symbols for each Fragment
  */
 
-public class CurrencySymbol {
+public class CurrencyHelper {
 
     public static String getCurrencySymbol(String cur) {
 

@@ -1,6 +1,6 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
-import android.icu.math.BigDecimal;
+import android.annotation.TargetApi;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,11 @@ import static com.etechbusinesssolutions.android.cryptoapp.BtcFragment.LOG_TAG;
  */
 
 public class CrytocurrencyQueryUtils {
+
+    /**
+     * Format to use for displayed currencies
+     */
+    DecimalFormat df = new DecimalFormat("#,###.###");
 
     // Array for names of currencies
     private static String[] majorCur = {
@@ -231,6 +237,7 @@ public class CrytocurrencyQueryUtils {
     }
 
 
+    @TargetApi(Build.VERSION_CODES.N)
     public static List<Currency> fetchCurrencyData (String requestUrl) {
 
         Log.i(LOG_TAG, "TEST: fetchCurrencyData() called ...");

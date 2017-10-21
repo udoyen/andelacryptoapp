@@ -29,22 +29,46 @@ public class ConversionActivity extends AppCompatActivity {
     //TODO: Remove
     // For logging
     public static final String LOG_TAG = ConversionActivity.class.getSimpleName();
-    //Value to convert
+
+    /**
+     * Value to convert
+     */
     double userInput;
-    // Create a spinner
+
+    /**
+     * Create a spinner
+     */
     Spinner spinner;
-    // Radio button state
+
+    /**
+     * Radio button state
+      */
     private String radioBtnState;
-    // Currency to convert
+
+    /**
+     * Currency to convert
+     */
     private String code;
+
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
 
-    //Used to determine if user has entered a number
-    // default is false.
+    /**
+     * Used to determine if user has entered a number
+     * default is false.
+     */
     boolean editBoxWithText = false;
 
-    // Create EditText object
+
+    /**
+     * Used to check if conversion button
+     * has been clicked
+     */
+    boolean conversionBtn = false;
+
+    /**
+     * Create EditText object
+     */
     EditText value1;
 
 
@@ -161,7 +185,10 @@ public class ConversionActivity extends AppCompatActivity {
                 // Set the currency logo text and make it visible
                 currencyLogo.setText(R.string.conversion_radio_btc_btn);
                 currencyLogo.setVisibility(View.VISIBLE);
-                if (editBoxWithText) {
+
+                //Check if user has entered some text, and
+                //whether conversion button was clicked.
+                if (editBoxWithText && conversionBtn) {
                     //TODO: Remove
                     Log.i(LOG_TAG, "conversion() called from btc radio button click");
                     conversion();
@@ -178,7 +205,11 @@ public class ConversionActivity extends AppCompatActivity {
                 // Set the currency logo text and make it visible
                 currencyLogo.setText(R.string.conversion_radio_eth_btn);
                 currencyLogo.setVisibility(View.VISIBLE);
-                if (editBoxWithText) {
+
+
+                 //Check if user has entered some text, and
+                 //whether conversion button was clicked.
+                if (editBoxWithText && conversionBtn) {
                     //TODO: Remove
                     Log.i(LOG_TAG, "conversion() called from btc radio button click");
                     conversion();
@@ -241,7 +272,7 @@ public class ConversionActivity extends AppCompatActivity {
             try {
 
                 // Format to use for calculated conversion
-                DecimalFormat df = new DecimalFormat("#.####");
+                DecimalFormat df = new DecimalFormat("#,###.###");
 
                 // Get the value of the currency from tha database
                 double value = Double.parseDouble(mDBHelper.getCurrencyValue(code, radioBtnState));
@@ -252,9 +283,8 @@ public class ConversionActivity extends AppCompatActivity {
                 // Calculate the conversion rate
                 cal = userInput / value;
 
-
-                result = String.valueOf(Double.valueOf(df.format(cal)));
-
+                // Used to format the calculation output
+                result = df.format(cal);
 
                 //TODO: Remove
                 Log.i(LOG_TAG, "Result of the conversion: " + result);
@@ -280,6 +310,9 @@ public class ConversionActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onConvertBtnClick(View view) {
+
+        // Signal button click has occurred
+        conversionBtn = true;
 
         // Call the conversion method
         //TODO: Remove
