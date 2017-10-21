@@ -1,15 +1,22 @@
 package com.etechbusinesssolutions.android.cryptoapp.cardview;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.etechbusinesssolutions.android.cryptoapp.R;
+import com.etechbusinesssolutions.android.cryptoapp.conversion.ConversionActivity;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 import com.etechbusinesssolutions.android.cryptoapp.data.CurrencySymbol;
 
@@ -34,6 +41,25 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
     String currency_code;
 
+    //PagerImages
+    /**
+     * The number of pages (wizard steps) to show in this demo.
+     */
+    private static final int NUM_PAGES = 2;
+
+    /**
+     * The pager widget, which handles animation and allows swiping horizontally to access previous
+     * and next wizard steps.
+     */
+    private ViewPager mPager;
+
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private PagerAdapter mPagerAdapter;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +76,10 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
         currency_code = extras.getString("CURRENCY_CODE");
 
+        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+        View inflatedLayout = inflater.inflate(R.layout.image_slider, null, false);
+
+
         // Instantiate the spinner
         spinner = (Spinner) findViewById(R.id.currency_name_spinner);
 
@@ -60,7 +90,26 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
         // Load the spinner data from database
         loadSpinnerData();
 
+
+        // Set up CardView to take user to conversion view
+        CardView cardView = (CardView) findViewById(R.id.card_container);
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: Remove
+                Log.i(LOG_TAG, "CardView onCLick event fired ...");
+                Toast.makeText(CardActivity.this, "Clicked on CardView", Toast.LENGTH_LONG).show();
+
+                Intent customConversionRate = new Intent(getApplicationContext(), ConversionActivity.class);
+                startActivity(customConversionRate);
+
+            }
+        });
+
+
+
     }
+
 
 
     private void loadSpinnerData() {
@@ -97,6 +146,7 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
         // Get the item that was selected or clicked
         String code = parent.getItemAtPosition(position).toString();
+        //TODO: Remove
         Log.i(LOG_TAG, "Spinner selected code is: " + code);
         Log.i(LOG_TAG, "currency_code is: " + currency_code + " and code is " + code);
 

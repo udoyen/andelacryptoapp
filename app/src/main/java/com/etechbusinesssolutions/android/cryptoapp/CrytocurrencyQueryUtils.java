@@ -1,5 +1,8 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
+import android.icu.math.BigDecimal;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -87,6 +90,7 @@ public class CrytocurrencyQueryUtils {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private  static List<Currency> extractFeatureFromJson (String cryptoJSON) {
 
         // if the JSON string is empty or null, then return early.
@@ -117,8 +121,11 @@ public class CrytocurrencyQueryUtils {
                 //String ethCurrency = eth.keys().next();
                 double ethValue = eth.getDouble(majorCur[i]);
 
+                //BigDecimal ethValue = BigDecimal.valueOf(eth.getDouble(majorCur[i]));
+
                 //String btcCurrency = btc.keys().next();
                 double btcValue = btc.getDouble(majorCur[i]);
+                //BigDecimal btcValue = BigDecimal.valueOf(eth.getDouble(majorCur[i]));
 
 
                 // Create a new {@link Currency} object with the key, and value
