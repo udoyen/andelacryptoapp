@@ -33,12 +33,21 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
      * This really comes into play when you're using multiple loaders
      */
     private static final int DATABASE_LOADER_ID = 3;
-    // String to identify intent source
+
+    /**
+     *  String to identify intent source
+     */
     private static final String ETH_CODE = "eth_value";
-    // Adapter for the list of currencies values gotten from database
+
+    /**
+     * Adapter for the list of currencies values gotten from database
+     */
     private EthCurrencyAdapter mAdapter;
+
     //TODO: Remove
-    //Create an instance of CryptoCurrencyDBHelper
+    /**
+     * Create an instance of CryptoCurrencyDBHelper
+     */
     private CryptoCurrencyDBHelper mDBHelper;
 
 
@@ -49,14 +58,14 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.currency_base, container, false);
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // currency_base.xml layout file.
-        ListView listView = rootView.findViewById(R.id.list);
+        final ListView listView = rootView.findViewById(R.id.list);
         //TODO: Add an empty view for when no data exists
 
         // Create an {@link BtcCurrencyAdapter}, whose data source is a list of {@link Currency}.
@@ -73,15 +82,22 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //TODO: Reove if not needed
                 //Get the current currency that was clicked
-                //Currency currency = (Currency) mAdapter.getItem(position);
+                int number = (int) mAdapter.getItemId(position);
+
+                //TODO: Remove
+                Log.i(LOG_TAG, "Position of eth item clicked: " + number);
+
+
 
                 // Create new intent to view CardView
                 Intent cardViewIntent = new Intent(rootView.getContext(), CardActivity.class);
 
                 // Send the "eth_value" to CardView so the right database columns will be accessed
+                // and send the column name too so the Spinner default value
+                // will be set.
                 cardViewIntent.putExtra("CURRENCY_CODE", ETH_CODE);
+                cardViewIntent.putExtra("COLUMN_NAME", number);
 
                 startActivity(cardViewIntent);
 

@@ -18,63 +18,75 @@
         android:id="@+id/card_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
         android:layout_margin="26dp"
-        >
+        android:layout_weight="4">
 
         <LinearLayout
             android:id="@+id/cardview_base_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_marginBottom="20dp">
-                <android.support.v4.view.ViewPager
-                    android:id="@+id/pager"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_alignParentTop="true" />
-            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/card_crypto_image"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/bitcoin"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:padding="20dp"/>
+
             <LinearLayout
                 android:id="@+id/card_currency_base"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/card_currency_logo"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:text="@string/currency_logo"
-                    android:textSize="20sp"
-                    android:gravity="center"
                     android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
                     android:layout_marginEnd="10dp"
-                    android:background="@drawable/circular_currency_background"/>
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/circular_currency_background"
+                    android:gravity="center"
+                    android:text="@string/currency_logo"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/card_currency_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:text="@string/currency_value"
-                    android:textSize="30sp"
                     android:textColor="@android:color/black"
-                    android:layout_gravity="center"/>
+                    android:textSize="30sp" />
             </LinearLayout>
+
             <Spinner
-                android:id="@+id/currency_name_spinner"
-                android:layout_marginTop="40dp"
+                android:id="@+id/crypt_cur_spinner"
+                style="@style/spinner_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="15dp"
-                android:textAlignment="center"
+                android:layout_marginTop="40dp"
+                android:textAlignment="center">
+
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/currency_name_spinner"
                 style="@style/spinner_style"
-                >
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="40dp"
+                android:textAlignment="center">
 
             </Spinner>
 

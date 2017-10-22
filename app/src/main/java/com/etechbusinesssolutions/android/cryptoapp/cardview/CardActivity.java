@@ -2,15 +2,13 @@ package com.etechbusinesssolutions.android.cryptoapp.cardview;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,38 +31,50 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
     private CryptoCurrencyDBHelper mDBHelper;
 
 
-    // Create a spinner
+    // Create a spinners
     Spinner spinner;
+    Spinner curSpinner;
 
     // String to identify intent source
     private static final String ETH_CODE = "eth_value";
     private static final String BTC_CODE = "btc_value";
 
+    /**
+     * Name of the database currency
+     * value from the Intent origin.
+     */
     String currency_code;
 
-    //PagerImages
     /**
-     * The number of pages (wizard steps) to show in this demo.
+     * Name of the column for which
+     * the Intent originated
      */
-    private static final int NUM_PAGES = 2;
-
-    /**
-     * The pager widget, which handles animation and allows swiping horizontally to access previous
-     * and next wizard steps.
-     */
-    private ViewPager mPager;
-
-    /**
-     * The pager adapter, which provides the pages to the view pager widget.
-     */
-    private PagerAdapter mPagerAdapter;
+    int columnPosition;
 
     /**
      * Format to use for displayed currencies
      */
     DecimalFormat df = new DecimalFormat("#,###.###");
 
+    /**
+     * Used to check if the spinner is
+     * drawn for the first time
+     */
+    private boolean spinnerClicked = false;
 
+    /**
+     * Used to check if the crypto spinner
+     * was drawn for the first time
+     */
+    private boolean curSpinnerClicked = false;
+
+
+    // Get the Card currency value
+    TextView curValue;
+    // The Currency logo
+    TextView logoText;
+    // Get the cryto currency image
+    ImageView cryptImage;
 
 
     @Override
@@ -81,20 +91,167 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         currency_code = extras.getString("CURRENCY_CODE");
+        columnPosition = extras.getInt("COLUMN_NAME");
 
-        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
-        View inflatedLayout = inflater.inflate(R.layout.image_slider, null, false);
-
-
-        // Instantiate the spinner
+        // Instantiate the spinners
         spinner = (Spinner) findViewById(R.id.currency_name_spinner);
+        curSpinner = (Spinner) findViewById(R.id.crypt_cur_spinner);
 
-
-        // Spinner listener
-        spinner.setOnItemSelectedListener(this);
 
         // Load the spinner data from database
         loadSpinnerData();
+        // Load the crypto spinner
+        loadCryptoSpinner();
+
+        //TODO: Remove
+        Log.i(LOG_TAG, "Column Position id sent here: " + columnPosition);
+
+
+        // Spinner listener
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Get the Card currency value
+                curValue = (TextView) findViewById(R.id.card_currency_value);
+                // The Currency logo
+                logoText = (TextView) findViewById(R.id.card_currency_logo);
+
+                // Get the cryto currency image
+                cryptImage = (ImageView) findViewById(R.id.card_crypto_image);
+
+
+                // Get the item that was selected or clicked
+                String code = parent.getItemAtPosition(position).toString();
+                //TODO: Remove
+                Log.i(LOG_TAG, "Spinner selected code is: " + code);
+                Log.i(LOG_TAG, "currency_code is: " + currency_code + " and code is " + code);
+
+
+                mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
+
+                // Check the state of the spinner
+                if (!spinnerClicked) {
+
+                    spinner.setSelection(columnPosition - 1);
+                    spinnerChecker();
+
+                }
+
+                if (currency_code != null) {
+                    //TODO: Remove
+                    Log.i(LOG_TAG, "Inside currency_code if block ...");
+
+                    if (currency_code.equals(ETH_CODE)) {
+
+                        //TODO: Remove
+                        Log.i(LOG_TAG, "Calling value from database in eth if block ...");
+
+                        String value = mDBHelper.getCurrencyValue(code, ETH_CODE);
+                        double num = Double.parseDouble(value);
+                        curValue.setText(df.format(num));
+                        logoText.setText(CurrencyHelper.getCurrencySymbol(code));
+                        // Top image for CardView
+                        cryptImage.setImageResource(R.drawable.ethereum);
+
+                    }
+                    if (currency_code.equals(BTC_CODE)) {
+
+                        //TODO: Remove
+                        Log.i(LOG_TAG, "Calling value from database in eth if block ...");
+
+                        String value = mDBHelper.getCurrencyValue(code, BTC_CODE);
+                        double num = Double.parseDouble(value);
+                        curValue.setText(df.format(num));
+                        logoText.setText(CurrencyHelper.getCurrencySymbol(code));
+                        // Top image for CardView
+                        cryptImage.setImageResource(R.drawable.bitcoin);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                spinner.setSelection(columnPosition - 1);
+            }
+        });
+
+        curSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Get the Card currency value
+                curValue = (TextView) findViewById(R.id.card_currency_value);
+                // The Currency logo
+                logoText = (TextView) findViewById(R.id.card_currency_logo);
+
+                // Get the cryto currency image
+                cryptImage = (ImageView) findViewById(R.id.card_crypto_image);
+
+                String code = spinner.getItemAtPosition(position).toString();
+                String cryptSelected = parent.getItemAtPosition(position).toString();
+
+                Log.i(LOG_TAG, "code value in curSpinner: " + code);
+
+                mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
+
+                if (!curSpinnerClicked) {
+                    //TODO: Remove
+                    Log.i(LOG_TAG, "Setting the displayed cryptoCurSpinner ...");
+
+                    if (currency_code != null) {
+                        if (currency_code.equals(ETH_CODE)) {
+                            //TODO: Remove
+                            Log.i(LOG_TAG, "Setting the displayed cryptoCurSpinner to ETH...");
+                            curSpinner.setSelection(0);
+                        }
+                        if (currency_code.equals(BTC_CODE)) {
+                            //TODO: Remove
+                            Log.i(LOG_TAG, "Setting the displayed cryptoCurSpinner to BTC...");
+                            curSpinner.setSelection(1);
+                        }
+                    }
+                    cryptoCurSpinnerChecker();
+                }
+
+
+                if (currency_code != null) {
+                    //TODO: Remove
+                    Log.i(LOG_TAG, "Inside currency_code if block of curSpinner... Value of currency_code " + currency_code + "cryptSelected: " + cryptSelected);
+
+                    if (currency_code.equals(ETH_CODE) && cryptSelected.matches("ETH")) {
+
+                        //TODO: Remove
+                        Log.i(LOG_TAG, "Calling value from database in eth if block of curSpinner...Value of currency_code " + currency_code);
+
+                        String value = mDBHelper.getCurrencyValue(code, ETH_CODE);
+                        double num = Double.parseDouble(value);
+                        curValue.setText(df.format(num));
+                        // Top image for CardView
+                        cryptImage.setImageResource(R.drawable.ethereum);
+
+                    }
+                    if (currency_code.equals(BTC_CODE) && cryptSelected.matches("BTC")) {
+
+                        //TODO: Remove
+                        Log.i(LOG_TAG, "Calling value from database in btc if block of curSpinner...Value of currency_code " + currency_code);
+
+                        String value = mDBHelper.getCurrencyValue(code, BTC_CODE);
+                        double num = Double.parseDouble(value);
+                        curValue.setText(df.format(num));
+                        // Top image for CardView
+                        cryptImage.setImageResource(R.drawable.bitcoin);
+
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
         // Set up CardView to take user to conversion view
@@ -112,12 +269,11 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-
-
     }
 
-
-
+    /**
+     * Loads currency choice spinner
+     */
     private void loadSpinnerData() {
 
         //TODO: Remove
@@ -140,54 +296,32 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
         // Attach dataAdapter to spinner
         spinner.setAdapter(dataAdapter);
 
+
     }
+
+    private void loadCryptoSpinner() {
+
+        //TODO: Remove
+        // For logging
+        Log.i(LOG_TAG, "loadCryptoSpinner() called ...");
+
+        // Create an adapter from the string array resource and use
+        // android's inbuilt layout file simple_spinner_item
+        // that represents the default spinner in the UI
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.crypto_array, android.R.layout.simple_spinner_item);
+
+        // Set the layout to use for each dropdown item
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        curSpinner.setAdapter(adapter);
+
+
+    }
+
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-        // Get the Card currency value
-        TextView curValue = (TextView) findViewById(R.id.card_currency_value);
-        // The Currency logo
-        TextView logoText = (TextView) findViewById(R.id.card_currency_logo);
-
-        // Get the item that was selected or clicked
-        String code = parent.getItemAtPosition(position).toString();
-        //TODO: Remove
-        Log.i(LOG_TAG, "Spinner selected code is: " + code);
-        Log.i(LOG_TAG, "currency_code is: " + currency_code + " and code is " + code);
-
-
-        mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
-
-
-        if (currency_code != null) {
-            //TODO: Remove
-            Log.i(LOG_TAG, "Inside currency_code if block ...");
-
-            if (currency_code.equals(ETH_CODE)) {
-
-                //TODO: Remove
-                Log.i(LOG_TAG, "Calling value from database in eth if block ...");
-
-                String value = mDBHelper.getCurrencyValue(code, ETH_CODE);
-                double num = Double.parseDouble(value);
-                curValue.setText(df.format(num));
-                logoText.setText(CurrencyHelper.getCurrencySymbol(code));
-
-            }
-            if (currency_code.equals(BTC_CODE)) {
-
-                //TODO: Remove
-                Log.i(LOG_TAG, "Calling value from database in eth if block ...");
-
-                String value = mDBHelper.getCurrencyValue(code, BTC_CODE);
-                double num = Double.parseDouble(value);
-                curValue.setText(df.format(num));
-                logoText.setText(CurrencyHelper.getCurrencySymbol(code));
-
-            }
-        }
-
 
     }
 
@@ -197,4 +331,35 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
         // TODO: What should happen when nothing is selected?
 
     }
+
+
+    /**
+     * Checks the original state
+     * of the currency spinner setOnItemSelectedListener
+     * event.
+     */
+    public void spinnerChecker() {
+
+        if (!spinnerClicked) {
+
+            spinnerClicked = true;
+
+        }
+    }
+
+    /**
+     * Checks the original state
+     * of the crypto spinner setOnItemSelectedListener
+     * event.
+     */
+    public void cryptoCurSpinnerChecker() {
+
+        if (!curSpinnerClicked) {
+
+            curSpinnerClicked = true;
+        }
+    }
+
+
+
 }

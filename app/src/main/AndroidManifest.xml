@@ -44,7 +44,8 @@
         <activity
             android:name=".cardview.CardActivity"
             android:label="Individual Currency Rates"
-            android:parentActivityName=".HomeActivity">
+            android:parentActivityName=".HomeActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".HomeActivity" />
