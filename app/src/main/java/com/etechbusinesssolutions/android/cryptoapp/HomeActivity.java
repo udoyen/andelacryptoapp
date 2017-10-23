@@ -50,6 +50,28 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Get a reference to the ConnectivityManager to check state of network connectivity
+        Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        //check internet connection
+        Log.i(LOG_TAG, "TEST: Internet connection checked ...");
+        NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
+
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+
+            // Get a reference to the loader manager in order to interact with loaders
+            Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
+            LoaderManager loaderManager = getLoaderManager();
+
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            Log.i(LOG_TAG, "TEST: Calling initloader()...");
+            loaderManager.initLoader(CRYPTOCURRENCY_LOADER_ID, null, this);
+
+        }
+
         // set the content activity to use for the activity_home.xml layout file
         setContentView(R.layout.activity_home);
 
@@ -68,30 +90,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tab);
         assert tabLayout != null;
         tabLayout.setupWithViewPager(viewPager);
-
-        // Get a reference to the ConnectivityManager to check state of network connectivity
-        Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        //check internet connection
-        Log.i(LOG_TAG, "TEST: Internet connection checked ...");
-        NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
-
-
-        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
-
-            // Get a reference to the loader manager in order to interact with loaders
-            Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
-            LoaderManager loaderManager = getLoaderManager();
-
-            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-            // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-            // because this activity implements the LoaderCallbacks interface).
-            Log.i(LOG_TAG, "TEST: Calling initloader()...");
-            loaderManager.initLoader(CRYPTOCURRENCY_LOADER_ID, null, this);
-
-        }
-
 
     }
 
@@ -130,7 +128,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         Log.i(LOG_TAG, "Checking if database is present...");
 
 
-        boolean found = isTableExists("currency.db");
+        boolean found = isTableExists();
         Log.i(LOG_TAG, "Found: " + found + "...");
 
         // Create an instance of the SQLiteDatabase
@@ -145,20 +143,28 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
                 values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                 // Update database
-                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?",
-                        new String[]{String.valueOf(element.getcId())});
+//                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?",
+//                        new String[]{String.valueOf(element.getcId())});
+                int mRowsUpdated = getContentResolver().update(
+                        CryptoContract.CurrencyEntry.CONTENT_URI,
+                        values,
+                        "_id = ?",
+                        new String[]{String.valueOf(element.getcId())}
+                );
+                //TODO: Use a content provider here
+                //Cursor cursor = getContentResolver().update();
 
                 // Log data insertion to catch any errors
                 // TODO: Remove
-                Log.v("HomeActivity db update", "New row ID " + newRowId + " Element id " + element.getcId());
-                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+                Log.v("HomeActivity db update", "New row ID " + mRowsUpdated + " Element id " + element.getcId());
+                Log.i("Row Entry " + mRowsUpdated, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
 
             }
 
 
             Log.i(LOG_TAG, "TEST: Database data update finished ...");
-
-            db.close();
+            //TODO: Remove
+            //db.close();
 
 
         } else {
@@ -170,17 +176,18 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
                 values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                 // Insert data into SQLiteDatabase
-                long newRowId = db.insert(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
+                //long newRowId = db.insert(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
+                Uri uri = getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
                 // Log data insertion to catch any errors
                 // TODO: Remove
-                Log.v("HomeActivity", "New row ID " + newRowId);
-                Log.i("Row Entry " + newRowId, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+                Log.v("HomeActivity", "Insert new row ID " + uri);
+                Log.i("Row Entry ", element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
 
             }
 
             Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
-
-            db.close();
+            //TODO: Remove
+            //db.close();
 
 
         }
@@ -192,24 +199,37 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onLoaderReset(Loader<List<Currency>> loader) {
         // TODO: Finish this
         Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
+        getLoaderManager().destroyLoader(1);
 
     }
 
     /**
      * Used to determine if the database exists
-     * so either an update is done or insert.
-     * @param tableName Name of database table
+     * so either an update is done or insert.     *
      * @return true
      */
-    public boolean isTableExists(String tableName) {
+    public boolean isTableExists() {
 
-        SQLiteDatabase test = mDBHelper.getReadableDatabase();
+        String[] projection = {
 
-        Cursor cursor = test.rawQuery("SELECT * FROM " + CryptoContract.CurrencyEntry.TABLE_NAME, null);
+                CryptoContract.CurrencyEntry._ID,
+                CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME,
+                CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE,
+                CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE
 
+        };
+
+        Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projection, null, null, null);
+
+        //TODO: Remove these
+        //SQLiteDatabase test = mDBHelper.getReadableDatabase();
+
+        //Cursor cursor = test.rawQuery("SELECT * FROM " + CryptoContract.CurrencyEntry.TABLE_NAME, null);
+
+        assert cursor != null;
         boolean exists = (cursor.getCount() > 0);
         cursor.close();
-        test.close();
+        //test.close();
 
         return exists;
 

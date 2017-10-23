@@ -8,12 +8,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.etechbusinesssolutions.android.cryptoapp.cardview.CardActivity;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
@@ -50,6 +53,20 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
      */
     private CryptoCurrencyDBHelper mDBHelper;
 
+    /**
+     * TextView that is displayed when the list is empty
+     */
+    private TextView mEmptyStateTextView;
+    /**
+     * Progressbar that is displayed before loader loads data
+     */
+    private ProgressBar progressBar;
+
+    /**
+     * SwipeRefreshLayout
+     */
+    private SwipeRefreshLayout mySwipeRefreshLayout;
+
 
     public EthFragment() {
 
@@ -66,7 +83,14 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // currency_base.xml layout file.
         final ListView listView = rootView.findViewById(R.id.list);
+
         //TODO: Add an empty view for when no data exists
+        // Get the empty  Text view
+        mEmptyStateTextView = rootView.findViewById(R.id.empty);
+        //TODO: Adda nice empty view to the layout file for this fragment
+        listView.setEmptyView(mEmptyStateTextView);
+
+        progressBar = rootView.findViewById(R.id.loading_spinner);
 
         // Create an {@link BtcCurrencyAdapter}, whose data source is a list of {@link Currency}.
         // The adapter knows how to create the list items for each item in the list.
@@ -106,16 +130,32 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         });
 
 
-        //****LoadManager will load information****
-        // Get a reference to the loader manager in order to interact with loaders
-        Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
-        LoaderManager loaderManager = getLoaderManager();
+        if (mAdapter.isEmpty()) {
+            //****LoadManager will load information****
+            // Get a reference to the loader manager in order to interact with loaders
+            //TODO: Remove
+            Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
+            LoaderManager loaderManager = getLoaderManager();
 
-        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-        // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-        // because this activity implements the LoaderCallbacks interface).
-        Log.i(LOG_TAG, "TEST: Calling initloader()...");
-        loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            //TODO: Remove
+            Log.i(LOG_TAG, "TEST: Calling initloader()...");
+            loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+
+            // progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
+            progressBar.setVisibility(View.GONE);
+
+        } else {
+
+            // Make sure the ListView is empty before displaying "No Internet Connection"
+            if (mAdapter.isEmpty()) {
+
+                //if there's no data to show. display TextView to no internet connection
+                mEmptyStateTextView.setText(R.string.no_data);
+            }
+        }
 
         return rootView;
     }
