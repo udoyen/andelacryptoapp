@@ -145,7 +145,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
                 values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                 // Update database
-                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?", new String[]{String.valueOf(element.getcId())});
+                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?",
+                        new String[]{String.valueOf(element.getcId())});
 
                 // Log data insertion to catch any errors
                 // TODO: Remove
@@ -195,6 +196,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     }
 
     /**
+     * Used to determine if the database exists
+     * so either an update is done or insert.
      * @param tableName Name of database table
      * @return true
      */

@@ -79,7 +79,6 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
                 Log.i(LOG_TAG, "Position of btc item clicked: " + number);
 
 
-
                 // Create new intent to view CardView
                 Intent cardViewIntent = new Intent(rootView.getContext(), CardActivity.class);
 

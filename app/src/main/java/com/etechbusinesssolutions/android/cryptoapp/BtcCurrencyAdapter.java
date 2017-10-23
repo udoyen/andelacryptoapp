@@ -40,7 +40,7 @@ public class BtcCurrencyAdapter extends CursorAdapter {
         return LayoutInflater.from(context).inflate(R.layout.currency_list_item, parent, false);
     }
 
-    // The bindView methos is used to bind all data to a given view
+    // The bindView method is used to bind all data to a given view
     // such as setting the text on a TextView.
     @Override
     public void bindView(View view, Context context, Cursor cursor) {

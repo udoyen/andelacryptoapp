@@ -46,13 +46,17 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
      * Format to use for displayed currencies
      */
     DecimalFormat df = new DecimalFormat("#,###.###");
+
     // Get the Card currency value
     TextView curValue;
+
     // The Currency logo
     TextView logoText;
+
     // Get the cryto currency image
     ImageView cryptImage;
-    String code;
+
+
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
     /**
@@ -110,7 +114,7 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
                 // Get the item that was selected or clicked
-                code = parent.getItemAtPosition(position).toString();
+                String code = parent.getItemAtPosition(position).toString();
                 //TODO: Remove
                 Log.i(LOG_TAG, "Spinner selected code is: " + code);
                 Log.i(LOG_TAG, "currency_code is: " + currency_code + " and code is " + code);
@@ -173,17 +177,17 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                 // The Currency logo
                 logoText = (TextView) findViewById(R.id.card_currency_logo);
 
-                // Get the cryto currency image
+                // Get the crypto currency image
                 cryptImage = (ImageView) findViewById(R.id.card_crypto_image);
 
                 // Get the spinner item that is currently selected
                 String code = spinner.getSelectedItem().toString();
                 String cryptSelected = parent.getItemAtPosition(position).toString();
-
+                //TODO: Remove
                 Log.i(LOG_TAG, "code value in curSpinner: " + code);
 
                 mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
-
+                //TODO: Remove
                 Log.i(LOG_TAG, "cryptoCurSpinnerChecker() called and the value: " + curSpinnerClicked);
 
                 if (!curSpinnerClicked) {
@@ -214,13 +218,13 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 if (currency_code != null) {
 
-                    if (cryptSelected.equals("ETH")) {
+                    if (cryptSelected.equals(getString(R.string.code_eth_text))) {
                         //TODO: Remove
                         Log.i(LOG_TAG, "Setting eth_ value currency_code to " + cryptSelected);
                         currency_code = "eth_value";
                     }
 
-                    if (cryptSelected.equals("BTC")) {
+                    if (cryptSelected.equals(getString(R.string.code_btc_text))) {
                         //TODO: Remove
                         Log.i(LOG_TAG, "Setting btc_ value currency_code to " + cryptSelected);
                         currency_code = "btc_value";
