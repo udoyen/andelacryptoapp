@@ -143,8 +143,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
                 values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                 // Update database
-//                long newRowId = db.update(CryptoContract.CurrencyEntry.TABLE_NAME, values, "_id = ?",
-//                        new String[]{String.valueOf(element.getcId())});
                 int mRowsUpdated = getContentResolver().update(
                         CryptoContract.CurrencyEntry.CONTENT_URI,
                         values,
@@ -176,7 +174,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
                 values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                 // Insert data into SQLiteDatabase
-                //long newRowId = db.insert(CryptoContract.CurrencyEntry.TABLE_NAME, null, values);
                 Uri uri = getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
                 // Log data insertion to catch any errors
                 // TODO: Remove
@@ -185,19 +182,14 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
             }
 
-            Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
-            //TODO: Remove
-            //db.close();
-
-
-        }
+            Log.i(LOG_TAG, "TEST: Database data insertion finished ...");        }
 
 
     }
 
     @Override
     public void onLoaderReset(Loader<List<Currency>> loader) {
-        // TODO: Finish this
+
         Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
         getLoaderManager().destroyLoader(1);
 
@@ -221,15 +213,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projection, null, null, null);
 
-        //TODO: Remove these
-        //SQLiteDatabase test = mDBHelper.getReadableDatabase();
-
-        //Cursor cursor = test.rawQuery("SELECT * FROM " + CryptoContract.CurrencyEntry.TABLE_NAME, null);
-
         assert cursor != null;
         boolean exists = (cursor.getCount() > 0);
         cursor.close();
-        //test.close();
 
         return exists;
 
