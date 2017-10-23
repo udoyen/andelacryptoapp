@@ -19,6 +19,7 @@ import android.util.Log;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
+import java.util.IllegalFormatException;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
@@ -154,6 +155,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
                 } catch (NullPointerException e) {
 
                     Log.i(LOG_TAG, "Update error iterating over the data ... " + e);
+                } catch (IllegalFormatException f) {
+
+                    Log.i(LOG_TAG, "Update format error ... " + f);
                 }
 
 
@@ -182,6 +186,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
                 } catch (NullPointerException e) {
 
                     Log.i(LOG_TAG, "database insert error no data to iterate over ... " + e);
+                } catch (IllegalFormatException f) {
+
+                    Log.i(LOG_TAG, "Update format error ... " + f);
                 }
 
 
@@ -189,6 +196,10 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         } catch (NullPointerException g) {
 
             Log.i(LOG_TAG, "Database existent confirmation error " + g);
+
+        } catch (IllegalFormatException f) {
+
+            Log.i(LOG_TAG, "Update format error ... " + f);
         }
 
 
