@@ -188,7 +188,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
             }
         } catch (NullPointerException g) {
 
-            Log.i(LOG_TAG, "Database existenct confirmation error " + g);
+            Log.i(LOG_TAG, "Database existent confirmation error " + g);
         }
 
 
