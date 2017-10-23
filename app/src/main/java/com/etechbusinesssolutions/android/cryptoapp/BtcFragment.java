@@ -17,7 +17,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.etechbusinesssolutions.android.cryptoapp.cardview.CardActivity;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract.CurrencyEntry;
@@ -48,7 +47,7 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
     /**
      * TextView that is displayed when the list is empty
      */
-    private TextView mEmptyStateTextView;
+    private View mEmptyStateTextView;
     /**
      * Progressbar that is displayed before loader loads data
      */
@@ -135,17 +134,11 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
             loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
             // progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
+            // TODO: Fix this
             progressBar.setVisibility(View.GONE);
-
-        } else {
-
-            // Make sure the ListView is empty before displaying "No Internet Connection"
-            if (mAdapter.isEmpty()) {
-
-                //if there's no data to show. display TextView to no internet connection
-                mEmptyStateTextView.setText(R.string.no_data);
-            }
         }
+
+
 
         /*
           Use this code to prevent SwipeRefreshLayout from interfering with
@@ -176,10 +169,6 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
         super.onViewCreated(view, savedInstanceState);
 
         mySwipeRefreshLayout = view.findViewById(R.id.swiperefresh);
-
-        //final ListView listView = view.findViewById(R.id.list);
-
-
         mySwipeRefreshLayout.setOnRefreshListener(this);
 
     }
@@ -236,9 +225,6 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
         // because this activity implements the LoaderCallbacks interface).
         loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
-        // Remove "No Internet Connection" TextView on reconnecting
-        // if Github Adapter was empty
-        mEmptyStateTextView.setVisibility(View.INVISIBLE);
 
     }
 

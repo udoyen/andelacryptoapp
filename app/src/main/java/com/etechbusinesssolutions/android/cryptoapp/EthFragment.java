@@ -1,7 +1,9 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,7 +19,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.etechbusinesssolutions.android.cryptoapp.cardview.CardActivity;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
@@ -57,7 +58,7 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
     /**
      * TextView that is displayed when the list is empty
      */
-    private TextView mEmptyStateTextView;
+    private View mEmptyStateTextView;
     /**
      * Progressbar that is displayed before loader loads data
      */
@@ -146,16 +147,9 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
             loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
             // progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
+            //TODO: Fix this.
             progressBar.setVisibility(View.GONE);
 
-        } else {
-
-            // Make sure the ListView is empty before displaying "No Internet Connection"
-            if (mAdapter.isEmpty()) {
-
-                //if there's no data to show. display TextView to no internet connection
-                mEmptyStateTextView.setText(R.string.no_data);
-            }
         }
 
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -184,10 +178,7 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
         super.onViewCreated(view, savedInstanceState);
 
-        //final ListView listView = view.findViewById(R.id.list);
-
         mySwipeRefreshLayout = view.findViewById(R.id.swiperefresh);
-
         mySwipeRefreshLayout.setOnRefreshListener(this);
 
     }
@@ -242,15 +233,33 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         // because this activity implements the LoaderCallbacks interface).
         loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
-        // Remove "No Internet Connection" TextView on reconnecting
-        // if Github Adapter was empty
-        mEmptyStateTextView.setVisibility(View.INVISIBLE);
-
     }
 
 
     @Override
     public void onRefresh() {
         userPageRefreshAction();
+    }
+
+    //TODO: Remove this if it does nothing
+    @TargetApi(Build.VERSION_CODES.O)
+    private void getDataInfo() {
+
+        String[] projection = {
+                CryptoContract.CurrencyEntry._ID,
+                CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME,
+                CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE
+        };
+
+
+        Cursor cursor = getContext().getContentResolver().query(
+                CryptoContract.CurrencyEntry.CONTENT_URI,
+                projection,
+                null,
+                null);
+
+
+
+
     }
 }
