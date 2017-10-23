@@ -197,6 +197,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     @Override
     public void onLoaderReset(Loader<List<Currency>> loader) {
 
+        //TODO: Remove
         Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
         getLoaderManager().destroyLoader(1);
 
@@ -204,7 +205,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     /**
      * Used to determine if the database exists
-     * so either an update is done or insert.     *
+     * so either an update is done or insert.
      *
      * @return true
      */
