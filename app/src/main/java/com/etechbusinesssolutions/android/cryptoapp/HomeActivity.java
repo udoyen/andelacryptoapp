@@ -32,13 +32,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
      * This really comes into play when you're using multiple loaders
      */
     private static final int CRYPTOCURRENCY_LOADER_ID = 1;
-
+    SQLiteDatabase db;
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
-
-    SQLiteDatabase db;
-
-
 
     //TODO: Do something with this method
     @Override
@@ -116,9 +112,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         //TODO: Load the information from CryptocrrencyQueryUtils into database using content provider
         Log.i(LOG_TAG, "TEST: onLoadFinished() called ...");
         Log.i(LOG_TAG, "TEST: Database data insertion started ...");
-        //Instantiate the CryptoCurrencyDBHelper
-        mDBHelper = new CryptoCurrencyDBHelper(this);
-
 
         // Create a ContentValues class object
         ContentValues values = new ContentValues();
@@ -131,58 +124,72 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         boolean found = isTableExists();
         Log.i(LOG_TAG, "Found: " + found + "...");
 
-        // Create an instance of the SQLiteDatabase
-        db = mDBHelper.getWritableDatabase();
+        try {
+
+            if (found) {
+
+                try {
+                    for (Currency element : data) {
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+                        // Update database
+                        int mRowsUpdated = getContentResolver().update(
+                                CryptoContract.CurrencyEntry.CONTENT_URI,
+                                values,
+                                "_id = ?",
+                                new String[]{String.valueOf(element.getcId())}
+                        );
+
+                        // Log data insertion to catch any errors
+                        // TODO: Remove
+                        Log.v("HomeActivity db update", "New row ID " + mRowsUpdated + " Element id " + element.getcId());
+                        Log.i("Row Entry " + mRowsUpdated, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+
+                    }
 
 
-        if (found) {
+                    Log.i(LOG_TAG, "TEST: Database data update finished ...");
+
+                } catch (NullPointerException e) {
+
+                    Log.i(LOG_TAG, "Update error iterating over the data ... " + e);
+                }
 
 
-            for (Currency element : data) {
-                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+            } else {
 
-                // Update database
-                int mRowsUpdated = getContentResolver().update(
-                        CryptoContract.CurrencyEntry.CONTENT_URI,
-                        values,
-                        "_id = ?",
-                        new String[]{String.valueOf(element.getcId())}
-                );
-                //TODO: Use a content provider here
-                //Cursor cursor = getContentResolver().update();
+                try {
 
-                // Log data insertion to catch any errors
-                // TODO: Remove
-                Log.v("HomeActivity db update", "New row ID " + mRowsUpdated + " Element id " + element.getcId());
-                Log.i("Row Entry " + mRowsUpdated, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+                    for (Currency element : data) {
+
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+                        // Insert data into SQLiteDatabase
+                        Uri uri = getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
+                        // Log data insertion to catch any errors
+                        // TODO: Remove
+                        Log.v("HomeActivity", "Insert new row ID " + uri);
+                        Log.i("Row Entry ", element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+
+                    }
+
+                    //TODO: Remove
+                    Log.i(LOG_TAG, "TEST: Database data insertion finished ...");
+
+                } catch (NullPointerException e) {
+
+                    Log.i(LOG_TAG, "database insert error no data to iterate over ... " + e);
+                }
+
 
             }
+        } catch (NullPointerException g) {
 
-
-            Log.i(LOG_TAG, "TEST: Database data update finished ...");
-            //TODO: Remove
-            //db.close();
-
-
-        } else {
-
-            for (Currency element : data) {
-
-                values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-                values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
-
-                // Insert data into SQLiteDatabase
-                Uri uri = getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
-                // Log data insertion to catch any errors
-                // TODO: Remove
-                Log.v("HomeActivity", "Insert new row ID " + uri);
-                Log.i("Row Entry ", element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
-
-            }
-
-            Log.i(LOG_TAG, "TEST: Database data insertion finished ...");        }
+            Log.i(LOG_TAG, "Database existenct confirmation error " + g);
+        }
 
 
     }
@@ -198,6 +205,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     /**
      * Used to determine if the database exists
      * so either an update is done or insert.     *
+     *
      * @return true
      */
     public boolean isTableExists() {

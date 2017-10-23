@@ -77,6 +77,23 @@ public class CurrencyProvider extends ContentProvider {
                 cursor = database.query(CryptoContract.CurrencyEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
+            case CURRENCY_ID:
+                // For the CURRENCY_ID code, extract out the ID from the URI,
+                // For an example URI such as "content://com.example.android.pets/3",
+                // the selection will be "_id=?" and the selection argument will be a
+                // String array containing the actual ID of # in this case.
+                //
+                // For entry "?" in the selection, we need to have an element in the selection
+                // argument that will fill in the "?". Since we have 1 question mark in the
+                // selection we have 1 String in the selection arguments' String array.
+                selection = CryptoContract.CurrencyEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri))};
+
+                // This will perform a query on the pets table where the _id equals 3 to return a
+                // Cursor containing that row of the table.
+                cursor = database.query(CryptoContract.CurrencyEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
                 default:
                     throw new IllegalArgumentException("Cannot query unknown URI " + uri);
 

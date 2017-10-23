@@ -39,38 +39,30 @@ public class ConversionActivity extends AppCompatActivity {
      * Create a spinner
      */
     Spinner spinner;
-
-    /**
-     * Radio button state
-      */
-    private String radioBtnState;
-
-    /**
-     * Currency to convert
-     */
-    private String code;
-
-    //Create an instance of CryptoCurrencyDBHelper
-    private CryptoCurrencyDBHelper mDBHelper;
-
     /**
      * Used to determine if user has entered a number
      * default is false.
      */
     boolean editBoxWithText = false;
-
-
     /**
      * Used to check if conversion button
      * has been clicked
      */
     boolean conversionBtn = false;
-
     /**
      * Create EditText object
      */
     EditText value1;
-
+    /**
+     * Radio button state
+     */
+    private String radioBtnState;
+    /**
+     * Currency to convert
+     */
+    private String code;
+    //Create an instance of CryptoCurrencyDBHelper
+    private CryptoCurrencyDBHelper mDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,8 +199,8 @@ public class ConversionActivity extends AppCompatActivity {
                 currencyLogo.setVisibility(View.VISIBLE);
 
 
-                 //Check if user has entered some text, and
-                 //whether conversion button was clicked.
+                //Check if user has entered some text, and
+                //whether conversion button was clicked.
                 if (editBoxWithText && conversionBtn) {
                     //TODO: Remove
                     Log.i(LOG_TAG, "conversion() called from btc radio button click");
