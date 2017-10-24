@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -379,6 +380,16 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
             curSpinnerClicked = true;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        //inflate the menu options from the menu xml file
+        //This add menu items to the app bar
+        getMenuInflater().inflate(R.menu.network_available, menu);
+
+        return true;
     }
 
 

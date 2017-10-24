@@ -28,7 +28,7 @@ import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
  * Created by george on 10/10/17.
  */
 
-public class EthFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
+public class EthFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Used for logging
     //TODO: Remove
@@ -69,6 +69,8 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
      */
     private SwipeRefreshLayout mySwipeRefreshLayout;
 
+    LoaderManager loaderManager;
+
 
     public EthFragment() {
 
@@ -86,10 +88,9 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         // currency_base.xml layout file.
         final ListView listView = rootView.findViewById(R.id.list);
 
-        //TODO: Add an empty view for when no data exists
         // Get the empty  Text view
         mEmptyStateTextView = rootView.findViewById(R.id.empty);
-        //TODO: Adda nice empty view to the layout file for this fragment
+        //Add a nice empty view to the layout file for this fragment
         listView.setEmptyView(mEmptyStateTextView);
 
         progressBar = rootView.findViewById(R.id.loading_spinner);
@@ -115,7 +116,6 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
                 Log.i(LOG_TAG, "Position of eth item clicked: " + number);
 
 
-
                 // Create new intent to view CardView
                 Intent cardViewIntent = new Intent(rootView.getContext(), CardActivity.class);
 
@@ -133,11 +133,12 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
 
         if (mAdapter.isEmpty()) {
+
             //****LoadManager will load information****
             // Get a reference to the loader manager in order to interact with loaders
             //TODO: Remove
             Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
-            LoaderManager loaderManager = getLoaderManager();
+            loaderManager = getLoaderManager();
 
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
@@ -146,12 +147,14 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
             Log.i(LOG_TAG, "TEST: Calling initloader()...");
             loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
-            // progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
-            //TODO: Fix this.
-            progressBar.setVisibility(View.GONE);
 
         }
 
+
+        /*
+          Use this code to prevent SwipeRefreshLayout from interfering with
+          Scrolling in ListView
+         */
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -179,12 +182,23 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         super.onViewCreated(view, savedInstanceState);
 
         mySwipeRefreshLayout = view.findViewById(R.id.swiperefresh);
-        mySwipeRefreshLayout.setOnRefreshListener(this);
-
+        // Set the color of the swiperefresh animation
+        mySwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorSecondaryDark);
+        mySwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //TODO: Remove
+                Log.i(LOG_TAG, "eth onRefresh() called ...");
+                userPageRefreshAction();
+                //onCreateLoader(1, getArguments());
+            }
+        });
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        //TODO: Remove
+        Log.i(LOG_TAG, "eth onCreateLoader() called...");
 
         // Define a projection that specifies which columns from the
         // database that will be used after this query
@@ -205,12 +219,18 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        //TODO: Remove
+        Log.i(LOG_TAG, "eth onLoadFinished() called ...");
 
         //TODO: Send cursor information back to cursorAdapter
         mAdapter.swapCursor(data);
 
+        // Stop the refreshing animation
+        mySwipeRefreshLayout.setRefreshing(false);
 
-
+        // progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
+        //TODO: Fix this.
+        progressBar.setVisibility(View.GONE);
 
     }
 
@@ -225,8 +245,11 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
     public void userPageRefreshAction() {
 
+        //TODO: Remove
+        Log.i(LOG_TAG, "eth Calling init LoadManager from userPageRefreshAction() ...");
+
         // Get a reference to the loader manager in order to interact with loaders
-        LoaderManager loaderManager = getLoaderManager();
+        loaderManager = getLoaderManager();
 
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
@@ -236,10 +259,6 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
     }
 
 
-    @Override
-    public void onRefresh() {
-        userPageRefreshAction();
-    }
 
     //TODO: Remove this if it does nothing
     @TargetApi(Build.VERSION_CODES.O)

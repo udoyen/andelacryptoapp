@@ -15,6 +15,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
@@ -37,6 +38,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
 
+
     //TODO: Do something with this method
     @Override
     protected void onStart() {
@@ -47,6 +49,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         // Get a reference to the ConnectivityManager to check state of network connectivity
         Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -56,6 +59,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
 
         if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+
 
             // Get a reference to the loader manager in order to interact with loaders
             Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
@@ -87,6 +91,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tab);
         assert tabLayout != null;
         tabLayout.setupWithViewPager(viewPager);
+
 
     }
 
@@ -241,4 +246,41 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        //inflate the menu options from the menu xml file
+        //This add menu items to the app bar
+        getMenuInflater().inflate(R.menu.network_available, menu);
+
+        if (menu != null) {
+
+            // Get a reference to the ConnectivityManager to check state of network connectivity
+            Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
+            ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            //check internet connection
+            Log.i(LOG_TAG, "TEST: Internet connection checked ...");
+            NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
+
+            if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+
+                // Let user know the status of the device network
+                menu.findItem(R.id.menu_network_available).setVisible(true);
+                menu.findItem(R.id.menu_network_absent).setVisible(false);
+            } else {
+
+                // Let user know the status of the device network
+                menu.findItem(R.id.menu_network_available).setVisible(false);
+                menu.findItem(R.id.menu_network_absent).setVisible(true);
+            }
+
+
+        }
+
+        return true;
+    }
+
+
 }

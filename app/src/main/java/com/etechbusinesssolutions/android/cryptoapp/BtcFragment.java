@@ -26,7 +26,7 @@ import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
  * Created by george on 10/10/17.
  */
 
-public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
+public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Used for logging
     //TODO: Remove
@@ -58,6 +58,8 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
      */
     private SwipeRefreshLayout mySwipeRefreshLayout;
 
+    LoaderManager loaderManager;
+
 
     public BtcFragment() {
         // Required empty public constructor
@@ -80,13 +82,16 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
         // The adapter knows how to create the list items for each item in the list.
         mAdapter = new BtcCurrencyAdapter(getContext(), null, false);
 
-        //TODO: Add an empty view for when no data exists
         // Get the empty  Text view
         mEmptyStateTextView = rootView.findViewById(R.id.empty);
-        //TODO: Adda nice empty view to the layout file for this fragment
+        //Add a nice empty view to the layout file for this fragment
         listView.setEmptyView(mEmptyStateTextView);
 
         progressBar = rootView.findViewById(R.id.loading_spinner);
+
+        // Create an {@link BtcCurrencyAdapter}, whose data source is a list of {@link Currency}.
+        // The adapter knows how to create the list items for each item in the list.
+        mAdapter = new BtcCurrencyAdapter(getContext(), null, false);
 
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
@@ -109,6 +114,8 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
 
 
                 // Send the "eth_value" to CardView so the right database columns will be accessed
+                // and send the column name too so the Spinner default value
+                // will be set.
                 cardViewIntent.putExtra("CURRENCY_CODE", BTC_CODE);
                 cardViewIntent.putExtra("COLUMN_NAME", number);
 
@@ -120,11 +127,12 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
 
 
         if (mAdapter.isEmpty()) {
+
             //****LoadManager will load information****
             // Get a reference to the loader manager in order to interact with loaders
             //TODO: Remove
             Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
-            LoaderManager loaderManager = getLoaderManager();
+            loaderManager = getLoaderManager();
 
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
@@ -133,12 +141,8 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
             Log.i(LOG_TAG, "TEST: Calling initloader()...");
             loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
-            // progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
-            // TODO: Fix this
-            progressBar.setVisibility(View.GONE);
+
         }
-
-
 
         /*
           Use this code to prevent SwipeRefreshLayout from interfering with
@@ -169,7 +173,14 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
         super.onViewCreated(view, savedInstanceState);
 
         mySwipeRefreshLayout = view.findViewById(R.id.swiperefresh);
-        mySwipeRefreshLayout.setOnRefreshListener(this);
+        mySwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorSecondaryDark);
+        mySwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                userPageRefreshAction();
+            }
+
+        });
 
     }
 
@@ -200,9 +211,12 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
 
         //TODO: Send cursor information back to cursorAdapter
         mAdapter.swapCursor(data);
+        // Stop the refreshing animation
+        mySwipeRefreshLayout.setRefreshing(false);
 
-
-
+        // progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
+        //TODO: Fix this.
+        progressBar.setVisibility(View.GONE);
 
     }
 
@@ -217,8 +231,11 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
 
     public void userPageRefreshAction() {
 
+        //TODO: Remove
+        Log.i(LOG_TAG, "BTC Calling init LoadManager from userPageRefreshAction() ...");
+
         // Get a reference to the loader manager in order to interact with loaders
-        LoaderManager loaderManager = getLoaderManager();
+        loaderManager = getLoaderManager();
 
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
@@ -229,8 +246,4 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
     }
 
 
-    @Override
-    public void onRefresh() {
-        userPageRefreshAction();
-    }
 }

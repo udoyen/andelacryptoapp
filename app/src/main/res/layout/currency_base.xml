@@ -22,38 +22,49 @@
             android:layout_centerInParent="true"
             >
 
-            <ImageView
-                android:id="@+id/empty_image"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/empty"
-                android:layout_centerInParent="true"
-                />
-
-            <TextView
-                android:id="@+id/empty_title_text"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/empty_image"
-                android:layout_centerHorizontal="true"
-                android:fontFamily="sans-serif-medium"
-                android:paddingTop="16dp"
-                android:textColor="@color/colorPrimaryDark"
-                android:text="@string/empty_view_title_text"
-                android:textAppearance="?android:textAppearanceMedium" />
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_centerInParent="true">
 
-            <TextView
-                android:id="@+id/empty_subtitle_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/empty_title_text"
-                android:layout_centerHorizontal="true"
-                android:fontFamily="sans-serif"
-                android:paddingTop="8dp"
-                android:text="@string/empty_view_subtitle_text"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="@color/colorSecondaryText" />
+                <ImageView
+                    android:id="@+id/empty_image"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/empty"
+                    android:layout_centerInParent="true"
+                    />
+
+                <TextView
+                    android:id="@+id/empty_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/empty_image"
+                    android:layout_centerHorizontal="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingTop="16dp"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:text="@string/empty_view_title_text"
+                    android:textAppearance="?android:textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/empty_subtitle_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/empty_title_text"
+                    android:layout_centerHorizontal="true"
+                    android:fontFamily="sans-serif"
+                    android:paddingTop="8dp"
+                    android:text="@string/empty_view_subtitle_text"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="@color/colorSecondaryText" />
+
+            </LinearLayout>
+
+
 
         </RelativeLayout>
 
