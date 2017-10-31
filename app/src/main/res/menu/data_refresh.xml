@@ -5,7 +5,8 @@
 
     <item
         android:id="@+id/menu_refresh"
-        app:showAsAction="never"
+        android:icon="@drawable/progress"
+        app:showAsAction="always"
         android:title="data Refresh"/>
 
 </menu>

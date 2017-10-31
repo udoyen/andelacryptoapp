@@ -59,6 +59,10 @@
                 android:value=".HomeActivity" />
 
         </activity>
+        <activity android:name=".cryptservice.MyQuerry" />
+
+        <service android:name=".cryptservice.JobSchedulerService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

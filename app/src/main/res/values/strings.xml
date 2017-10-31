@@ -16,8 +16,8 @@
     <string name="no_data">No data available!</string>
     <string name="empty_view_title_text">Database Outage</string>
     <string name="empty_view_subtitle_text">It appears we have no data …!</string>
-    <string name="network_absent">network_absent</string>
-    <string name="network_avalable">network avalable</string>
+    <string name="network_absent">no network</string>
+    <string name="network_avalable">network</string>
     <string-array name="crypto_array">
         <item>ETH</item>
         <item>BTC</item>

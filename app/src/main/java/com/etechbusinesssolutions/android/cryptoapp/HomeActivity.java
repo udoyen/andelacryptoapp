@@ -1,28 +1,39 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
+import android.annotation.TargetApi;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
-import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 
 import java.util.IllegalFormatException;
 import java.util.List;
 
+import io.hypertrack.smart_scheduler.Job;
+import io.hypertrack.smart_scheduler.SmartScheduler;
+
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
 
     //TODO: Remove
@@ -34,21 +45,25 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
      * This really comes into play when you're using multiple loaders
      */
     private static final int CRYPTOCURRENCY_LOADER_ID = 1;
-    SQLiteDatabase db;
-    //Create an instance of CryptoCurrencyDBHelper
-    private CryptoCurrencyDBHelper mDBHelper;
+
+    /**
+     *
+     */
+    private static final int JOB_ID = 1;
+    private static final String TAG = HomeActivity.class.getSimpleName();
+    private static final int JO_ID = 1;
+    private static final String JOB_PERIODIC_TASK_TAG = "com.etechbusinesssolutions.android.cryptoapp";
 
 
-    //TODO: Do something with this method
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+    JobScheduler mJobScheduler;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Initialize JobScheduler
+        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
         // Get a reference to the ConnectivityManager to check state of network connectivity
         Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
@@ -61,6 +76,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
 
 
+            //call.run();
+            //This is where my sync code will be, but for testing purposes I only have a Log statement
+            Log.v("Sync_test","this will run every minute");
             // Get a reference to the loader manager in order to interact with loaders
             Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
             LoaderManager loaderManager = getLoaderManager();
@@ -69,9 +87,11 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
             // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
             Log.i(LOG_TAG, "TEST: Calling initloader()...");
-            loaderManager.initLoader(CRYPTOCURRENCY_LOADER_ID, null, this);
+            loaderManager.initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
 
         }
+
+
 
         // set the content activity to use for the activity_home.xml layout file
         setContentView(R.layout.activity_home);
@@ -93,6 +113,44 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         tabLayout.setupWithViewPager(viewPager);
 
 
+    }
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+
+
+
+        SmartScheduler.JobScheduledCallback callback = new SmartScheduler.JobScheduledCallback() {
+            @Override
+            public void onJobScheduled(Context context, final Job job) {
+
+                if (job != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(HomeActivity.this, "Job: " + job.getJobId() + " scheduled!", Toast.LENGTH_SHORT).show();
+                            //getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+                            getLoaderManager().destroyLoader(CRYPTOCURRENCY_LOADER_ID);
+                            getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+                            MenuItem netAvail = (MenuItem) findViewById(R.id.menu_network_available);
+                            netAvail.setVisible(true);
+                            MenuItem noNetwork = (MenuItem) findViewById(R.id.menu_network_absent);
+                            noNetwork.setVisible(false);
+                        }
+                    });
+                }
+
+            }
+        };
+
+        Job.Builder builder= new Job.Builder(JO_ID, callback, Job.Type.JOB_TYPE_PERIODIC_TASK, JOB_PERIODIC_TASK_TAG)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setIntervalMillis(60000);
+
+        Job job = builder.build();
+        SmartScheduler jobScheduler = SmartScheduler.getInstance(getApplicationContext());
+        jobScheduler.addJob(job);
+        return super.onCreateView(parent, name, context, attrs);
     }
 
     @Override
@@ -149,8 +207,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
                         // Log data insertion to catch any errors
                         // TODO: Remove
-                        Log.v("HomeActivity db update", "New row ID " + mRowsUpdated + " Element id " + element.getcId());
-                        Log.i("Row Entry " + mRowsUpdated, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
+                        Log.v("HomeActivity_db_update", "New row ID " + mRowsUpdated + " Element id " + element.getcId());
+                        Log.i("Row_Entry " + mRowsUpdated, element.getcName() + " " + element.getcEthValue() + " " + element.getcBtcValue());
 
                     }
 
@@ -215,7 +273,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         //TODO: Remove
         Log.i(LOG_TAG, "TEST: onLoadReset() called ...");
-        getLoaderManager().destroyLoader(1);
+        getLoaderManager().destroyLoader(CRYPTOCURRENCY_LOADER_ID);
 
     }
 
@@ -281,6 +339,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         return true;
     }
+
 
 
 }

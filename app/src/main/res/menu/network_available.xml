@@ -7,14 +7,12 @@
         android:id="@+id/menu_network_available"
         android:visible="false"
         app:showAsAction="always"
-        android:icon="@drawable/network_present"
         android:title="@string/network_avalable"
         />
     <item
         android:id="@+id/menu_network_absent"
         android:visible="false"
         app:showAsAction="always"
-        android:icon="@drawable/network_absent"
         android:title="@string/network_absent"/>
 
 

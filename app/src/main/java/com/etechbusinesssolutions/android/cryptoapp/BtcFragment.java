@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,7 +27,7 @@ import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
  * Created by george on 10/10/17.
  */
 
-public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     // Used for logging
     //TODO: Remove
@@ -38,6 +39,7 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
     private static final int DATABASE_LOADER_ID = 2;
     // String to identify intent source
     private static final String BTC_CODE = "btc_value";
+    private static final String JOB_PERIODIC_TASK_TAG = "com.etechbusinesssolutions.android.cryptoapp";
     // Adapter for the list of currencies values gotten from database
     private BtcCurrencyAdapter mAdapter;
     //TODO: Remove
@@ -61,6 +63,8 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
     LoaderManager loaderManager;
 
 
+
+
     public BtcFragment() {
         // Required empty public constructor
     }
@@ -71,16 +75,10 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
 
         final View rootView = inflater.inflate(R.layout.currency_base, container, false);
 
-
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // currency_base.xml layout file.
         final ListView listView = rootView.findViewById(R.id.list);
-        //TODO: Add an empty view for when no data exists
-
-        // Create an {@link BtcCurrencyAdapter}, whose data source is a list of {@link Currency}.
-        // The adapter knows how to create the list items for each item in the list.
-        mAdapter = new BtcCurrencyAdapter(getContext(), null, false);
 
         // Get the empty  Text view
         mEmptyStateTextView = rootView.findViewById(R.id.empty);
@@ -96,6 +94,9 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
         listView.setAdapter(mAdapter);
+        // Notify listview of data changes in adapter
+        mAdapter.notifyDataSetChanged();
+
 
         // Respond to click event on user item
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -126,6 +127,7 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
         });
 
 
+
         if (mAdapter.isEmpty()) {
 
             //****LoadManager will load information****
@@ -143,6 +145,7 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
 
 
         }
+
 
         /*
           Use this code to prevent SwipeRefreshLayout from interfering with
@@ -181,6 +184,8 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
             }
 
         });
+
+
 
     }
 
@@ -242,8 +247,13 @@ public class BtcFragment extends Fragment implements LoaderManager.LoaderCallbac
         // because this activity implements the LoaderCallbacks interface).
         loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
 
-
     }
+
+
+
+
+
+
 
 
 }
