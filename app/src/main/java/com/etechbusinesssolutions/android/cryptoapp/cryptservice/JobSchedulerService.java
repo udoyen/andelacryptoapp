@@ -14,13 +14,11 @@ import android.widget.Toast;
  */
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class JobSchedulerService extends JobService  {
-
-    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
+public class JobSchedulerService extends JobService {
 
     //TODO: Remove
     public static final String LOG_TAG = JobSchedulerService.class.getSimpleName();
-
+    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
     private Handler mJobHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -38,7 +36,7 @@ public class JobSchedulerService extends JobService  {
     @Override
     public boolean onStartJob(JobParameters params) {
 
-        mJobHandler.sendMessage( Message.obtain( mJobHandler, 1, params));
+        mJobHandler.sendMessage(Message.obtain(mJobHandler, 1, params));
         return true;
     }
 

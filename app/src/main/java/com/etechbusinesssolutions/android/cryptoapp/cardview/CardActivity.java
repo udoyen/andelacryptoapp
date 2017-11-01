@@ -46,6 +46,12 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
     // String to identify intent source
     private static final String ETH_CODE = "eth_value";
     private static final String BTC_CODE = "btc_value";
+    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
+    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
+    /**
+     * JobScheduler Job ID
+     */
+    private static final int JOB_ID = 1;
     // Create a spinners
     Spinner spinner;
     Spinner curSpinner;
@@ -63,30 +69,12 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
      * Format to use for displayed currencies
      */
     DecimalFormat df = new DecimalFormat("#,###.###");
-
     // Get the Card currency value
     TextView curValue;
-
     // The Currency logo
     TextView logoText;
-
     // Get the cryto currency image
     ImageView cryptImage;
-
-
-    //Create an instance of CryptoCurrencyDBHelper
-    private CryptoCurrencyDBHelper mDBHelper;
-    /**
-     * Used to check if the spinner is
-     * drawn for the first time
-     */
-    private boolean spinnerClicked = false;
-    /**
-     * Used to check if the crypto spinner
-     * was drawn for the first time
-     */
-    private boolean curSpinnerClicked = false;
-
     /**
      * Create an instance of the JobScheduler class
      */
@@ -105,15 +93,6 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
      * Used to check network status
      */
     boolean online;
-
-    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
-    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
-
-    /**
-     * JobScheduler Job ID
-     */
-    private static final int JOB_ID = 1;
-
     /**
      * Use this to catch the intent sent from the JobSchedulerService class
      */
@@ -157,7 +136,18 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
     };
-
+    //Create an instance of CryptoCurrencyDBHelper
+    private CryptoCurrencyDBHelper mDBHelper;
+    /**
+     * Used to check if the spinner is
+     * drawn for the first time
+     */
+    private boolean spinnerClicked = false;
+    /**
+     * Used to check if the crypto spinner
+     * was drawn for the first time
+     */
+    private boolean curSpinnerClicked = false;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override

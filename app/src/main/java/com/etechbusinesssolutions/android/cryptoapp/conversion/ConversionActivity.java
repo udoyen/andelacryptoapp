@@ -46,12 +46,16 @@ public class ConversionActivity extends AppCompatActivity {
     //TODO: Remove
     // For logging
     public static final String LOG_TAG = ConversionActivity.class.getSimpleName();
-
+    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
+    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
+    /**
+     * JobScheduler Job ID
+     */
+    private static final int JOB_ID = 1;
     /**
      * Value to convert
      */
     double userInput;
-
     /**
      * Create a spinner
      */
@@ -71,24 +75,9 @@ public class ConversionActivity extends AppCompatActivity {
      */
     EditText value1;
     /**
-     * Radio button state
-     */
-    private String radioBtnState;
-    /**
-     * Currency to convert
-     */
-    private String code;
-    //Create an instance of CryptoCurrencyDBHelper
-    private CryptoCurrencyDBHelper mDBHelper;
-
-    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
-    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
-
-    /**
      * Create an instance of the JobScheduler class
      */
     JobScheduler mJobScheduler;
-
     /**
      * Used to set the menu items
      */
@@ -97,18 +86,10 @@ public class ConversionActivity extends AppCompatActivity {
      * Used to check network status
      */
     String status;
-
     /**
      * Used to check network status
      */
     boolean online;
-
-    /**
-     * JobScheduler Job ID
-     */
-    private static final int JOB_ID = 1;
-
-
     /**
      * Use this to catch the intent sent from the JobSchedulerService class
      */
@@ -149,6 +130,16 @@ public class ConversionActivity extends AppCompatActivity {
             }
         }
     };
+    /**
+     * Radio button state
+     */
+    private String radioBtnState;
+    /**
+     * Currency to convert
+     */
+    private String code;
+    //Create an instance of CryptoCurrencyDBHelper
+    private CryptoCurrencyDBHelper mDBHelper;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
