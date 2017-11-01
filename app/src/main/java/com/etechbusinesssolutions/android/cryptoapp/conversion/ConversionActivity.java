@@ -1,5 +1,8 @@
 package com.etechbusinesssolutions.android.cryptoapp.conversion;
 
+import android.app.Activity;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -317,12 +320,29 @@ public class ConversionActivity extends AppCompatActivity {
 
     }
 
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        //TODO: Simplify this
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         //inflate the menu options from the menu xml file
         //This add menu items to the app bar
         getMenuInflater().inflate(R.menu.network_available, menu);
+
+        if (isConnected()) {
+            // Let user know the status of the device network
+            menu.findItem(R.id.menu_network_available).setVisible(true);
+            menu.findItem(R.id.menu_network_absent).setVisible(false);
+        } else {
+            // Let user know the status of the device network
+            menu.findItem(R.id.menu_network_available).setVisible(false);
+            menu.findItem(R.id.menu_network_absent).setVisible(true);
+        }
 
         return true;
     }

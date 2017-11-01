@@ -1,12 +1,17 @@
 package com.etechbusinesssolutions.android.cryptoapp;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -14,6 +19,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -25,13 +31,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.etechbusinesssolutions.android.cryptoapp.cryptservice.JobSchedulerService;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
 
 import java.util.IllegalFormatException;
 import java.util.List;
-
-import io.hypertrack.smart_scheduler.Job;
-import io.hypertrack.smart_scheduler.SmartScheduler;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
@@ -51,19 +55,58 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
      */
     private static final int JOB_ID = 1;
     private static final String TAG = HomeActivity.class.getSimpleName();
-    private static final int JO_ID = 1;
-    private static final String JOB_PERIODIC_TASK_TAG = "com.etechbusinesssolutions.android.cryptoapp";
+
+    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
+    /**
+     * Use this to catch the intent sent from the JobSchedulerService class
+     */
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public IBinder peekService(Context myContext, Intent service) {
+            return super.peekService(myContext, service);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Toast.makeText(context, "Intent detected", Toast.LENGTH_SHORT).show();
+            MenuItem netMenuItem = menu.findItem(R.id.menu_network_available);
+            MenuItem nonetMenuItem = menu.findItem(R.id.menu_network_absent);
+            MenuItem refreshMenuItem = menu.findItem(R.id.menu_refresh);
+            nonetMenuItem.setVisible(false);
+            refreshMenuItem.setVisible(true);
+            getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+            //refreshMenuItem.setVisible(false);
 
 
+
+        }
+    };
+    /**
+     * Create an instance of the JobScheduler class
+     */
     JobScheduler mJobScheduler;
+
+    Menu menu = null;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Register the intent here
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MY_INTENT);
+        registerReceiver(this.broadcastReceiver, intentFilter);
+
         // Initialize JobScheduler
         mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
+                new ComponentName(this, JobSchedulerService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(60000)
+                .build());
 
         // Get a reference to the ConnectivityManager to check state of network connectivity
         Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
@@ -78,7 +121,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
             //call.run();
             //This is where my sync code will be, but for testing purposes I only have a Log statement
-            Log.v("Sync_test","this will run every minute");
+            Log.v("Sync_test", "this will run every minute");
             // Get a reference to the loader manager in order to interact with loaders
             Log.i(LOG_TAG, "TEST: Get the LoadManager being used ...");
             LoaderManager loaderManager = getLoaderManager();
@@ -90,7 +133,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
             loaderManager.initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
 
         }
-
 
 
         // set the content activity to use for the activity_home.xml layout file
@@ -108,50 +150,78 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         assert viewPager != null;
         viewPager.setAdapter(adapter);
 
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tab);
         assert tabLayout != null;
         tabLayout.setupWithViewPager(viewPager);
 
+        // Used with dynamically registered Broadcast receiver
+        // when using an inner Braodcast class that must be static
 
+//        IntentFilter filter = new IntentFilter(MyReceiver.MY_RECEIVER);
+//        BroadcastReceiver receiver = new MyReceiver();
+//        registerReceiver(receiver, filter);
+
+
+    }
+
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        //TODO: Simplify this
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
 
 
-
-        SmartScheduler.JobScheduledCallback callback = new SmartScheduler.JobScheduledCallback() {
-            @Override
-            public void onJobScheduled(Context context, final Job job) {
-
-                if (job != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(HomeActivity.this, "Job: " + job.getJobId() + " scheduled!", Toast.LENGTH_SHORT).show();
-                            //getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
-                            getLoaderManager().destroyLoader(CRYPTOCURRENCY_LOADER_ID);
-                            getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
-                            MenuItem netAvail = (MenuItem) findViewById(R.id.menu_network_available);
-                            netAvail.setVisible(true);
-                            MenuItem noNetwork = (MenuItem) findViewById(R.id.menu_network_absent);
-                            noNetwork.setVisible(false);
-                        }
-                    });
-                }
-
-            }
-        };
-
-        Job.Builder builder= new Job.Builder(JO_ID, callback, Job.Type.JOB_TYPE_PERIODIC_TASK, JOB_PERIODIC_TASK_TAG)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setIntervalMillis(60000);
-
-        Job job = builder.build();
-        SmartScheduler jobScheduler = SmartScheduler.getInstance(getApplicationContext());
-        jobScheduler.addJob(job);
+//
+//        SmartScheduler.JobScheduledCallback callback = new SmartScheduler.JobScheduledCallback() {
+//            @Override
+//            public void onJobScheduled(Context context, final Job job) {
+//
+//                if (job != null) {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(HomeActivity.this, "Job: " + job.getJobId() + " scheduled!", Toast.LENGTH_SHORT).show();
+//                            //getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+//                            getLoaderManager().destroyLoader(CRYPTOCURRENCY_LOADER_ID);
+//                            getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+//
+//                        }
+//                    });
+//                }
+//
+//            }
+//        };
+//
+//        Job.Builder builder= new Job.Builder(JO_ID, callback, Job.Type.JOB_TYPE_PERIODIC_TASK, JOB_PERIODIC_TASK_TAG)
+//                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//                .setIntervalMillis(30000);
+//
+//        Job job = builder.build();
+//        SmartScheduler jobScheduler = SmartScheduler.getInstance(getApplicationContext());
+//        jobScheduler.addJob(job);
         return super.onCreateView(parent, name, context, attrs);
     }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerReceiver(broadcastReceiver, new IntentFilter(MY_INTENT));
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+
+    }
+
 
     @Override
     public Loader<List<Currency>> onCreateLoader(int id, Bundle args) {
@@ -306,29 +376,20 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
 
         //inflate the menu options from the menu xml file
         //This add menu items to the app bar
         getMenuInflater().inflate(R.menu.network_available, menu);
+        this.menu = menu;
 
         if (menu != null) {
 
-            // Get a reference to the ConnectivityManager to check state of network connectivity
-            Log.i(LOG_TAG, "TEST: Connectivity Manager Instance created ...");
-            ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-            //check internet connection
-            Log.i(LOG_TAG, "TEST: Internet connection checked ...");
-            NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
-
-            if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
-
+            if (isConnected()) {
                 // Let user know the status of the device network
                 menu.findItem(R.id.menu_network_available).setVisible(true);
                 menu.findItem(R.id.menu_network_absent).setVisible(false);
             } else {
-
                 // Let user know the status of the device network
                 menu.findItem(R.id.menu_network_available).setVisible(false);
                 menu.findItem(R.id.menu_network_absent).setVisible(true);
@@ -337,9 +398,30 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         }
 
+
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
 
+
+
+        return true;
+    }
+
+    //    public static class MyReceiver extends BroadcastReceiver {
+//
+//        private static final String MY_RECEIVER = "com.etechbusinesssolutions.android.cryptoapp";
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            Toast.makeText(context, "Intent detected", Toast.LENGTH_SHORT).show();
+//
+//        }
+//    }
 
 }
+
+

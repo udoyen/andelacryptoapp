@@ -50,7 +50,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".HomeActivity" />
         </activity>
-        <activity android:name=".conversion.ConversionActivity"
+        <activity
+            android:name=".conversion.ConversionActivity"
             android:label="Conversion"
             android:parentActivityName=".HomeActivity"
             android:screenOrientation="portrait">
@@ -59,10 +60,10 @@
                 android:value=".HomeActivity" />
 
         </activity>
-        <activity android:name=".cryptservice.MyQuerry" />
-
-        <service android:name=".cryptservice.JobSchedulerService"
+        <service
+            android:name=".cryptservice.JobSchedulerService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
     </application>
 
 </manifest>
