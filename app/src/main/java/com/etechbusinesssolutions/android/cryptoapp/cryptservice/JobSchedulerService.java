@@ -24,6 +24,7 @@ public class JobSchedulerService extends JobService  {
     private Handler mJobHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
+            //TODO: Remove
             Toast.makeText(getApplicationContext(),
                     "JobService task running", Toast.LENGTH_SHORT)
                     .show();

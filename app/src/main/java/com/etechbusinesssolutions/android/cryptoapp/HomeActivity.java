@@ -33,9 +33,11 @@ import android.widget.Toast;
 
 import com.etechbusinesssolutions.android.cryptoapp.cryptservice.JobSchedulerService;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoContract;
+import com.etechbusinesssolutions.android.cryptoapp.networkutil.NetworkUtil;
 
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Objects;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<List<Currency>> {
@@ -51,12 +53,33 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     private static final int CRYPTOCURRENCY_LOADER_ID = 1;
 
     /**
-     *
+     * JobScheduler Job ID
      */
     private static final int JOB_ID = 1;
     private static final String TAG = HomeActivity.class.getSimpleName();
 
     private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
+    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
+
+    /**
+     * Create an instance of the JobScheduler class
+     */
+    JobScheduler mJobScheduler;
+
+    /**
+     * Used to set the menu items
+     */
+    Menu menu = null;
+    /**
+     * Used to check network status
+     */
+    String status;
+
+    /**
+     * Used to check network status
+     */
+    boolean online;
+
     /**
      * Use this to catch the intent sent from the JobSchedulerService class
      */
@@ -70,25 +93,37 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         @Override
         public void onReceive(Context context, Intent intent) {
 
+            //TODO: Remove
             Toast.makeText(context, "Intent detected", Toast.LENGTH_SHORT).show();
-            MenuItem netMenuItem = menu.findItem(R.id.menu_network_available);
-            MenuItem nonetMenuItem = menu.findItem(R.id.menu_network_absent);
-            MenuItem refreshMenuItem = menu.findItem(R.id.menu_refresh);
-            nonetMenuItem.setVisible(false);
-            refreshMenuItem.setVisible(true);
-            getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
-            //refreshMenuItem.setVisible(false);
 
+            if (intent.getAction().equals(MY_INTENT)) {
 
+                //TODO: Remove
+                Toast.makeText(context, "MY_INTENT", Toast.LENGTH_SHORT).show();
 
+                MenuItem refreshMenuItem = menu.findItem(R.id.menu_refresh);
+                refreshMenuItem.setVisible(true);
+                getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+//                if ( !getLoaderManager().getLoader(CRYPTOCURRENCY_LOADER_ID).isStarted()) {
+//                    refreshMenuItem.setVisible(false);
+//                }
+
+            }
+
+            // Set the network menu status
+            if (intent.getAction().equals(CONNECTION_INTENT)) {
+
+                //TODO: Remove
+                Toast.makeText(context, "CONNECT_INTENT", Toast.LENGTH_SHORT).show();
+
+                status = NetworkUtil.getConnectivityStatusString(context);
+                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
+                supportInvalidateOptionsMenu();
+
+            }
         }
     };
-    /**
-     * Create an instance of the JobScheduler class
-     */
-    JobScheduler mJobScheduler;
 
-    Menu menu = null;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -98,6 +133,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
         // Register the intent here
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MY_INTENT);
+        intentFilter.addAction(CONNECTION_INTENT);
         registerReceiver(this.broadcastReceiver, intentFilter);
 
         // Initialize JobScheduler
@@ -212,6 +248,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void onResume() {
         super.onResume();
         registerReceiver(broadcastReceiver, new IntentFilter(MY_INTENT));
+        registerReceiver(broadcastReceiver, new IntentFilter(CONNECTION_INTENT));
 
     }
 
@@ -404,9 +441,11 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
+        MenuItem netMenuItem = menu.findItem(R.id.menu_network_available);
+        MenuItem nonetMenuItem = menu.findItem(R.id.menu_network_absent);
 
-
+        netMenuItem.setVisible(online);
+        nonetMenuItem.setVisible(!online);
 
         return true;
     }
@@ -422,6 +461,10 @@ public class HomeActivity extends AppCompatActivity implements LoaderCallbacks<L
 //        }
 //    }
 
+
+
 }
+
+
 
 

@@ -3,11 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <item
-        android:id="@+id/menu_network_available"
-        android:title="@string/network_avalable"
-        android:visible="false"
-        app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_refresh"
@@ -15,11 +10,19 @@
         android:title="data Refresh"
         android:visible="false"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_network_available"
+        android:title="@string/network_avalable"
+        android:visible="false"
+        app:showAsAction="always" />
+
+
     <item
         android:id="@+id/menu_network_absent"
         android:title="@string/network_absent"
         android:visible="true"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 
 </menu>

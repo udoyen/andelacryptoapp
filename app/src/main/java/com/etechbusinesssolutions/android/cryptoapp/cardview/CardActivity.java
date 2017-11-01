@@ -1,14 +1,24 @@
 package com.etechbusinesssolutions.android.cryptoapp.cardview;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,11 +29,14 @@ import android.widget.Toast;
 
 import com.etechbusinesssolutions.android.cryptoapp.R;
 import com.etechbusinesssolutions.android.cryptoapp.conversion.ConversionActivity;
+import com.etechbusinesssolutions.android.cryptoapp.cryptservice.JobSchedulerService;
 import com.etechbusinesssolutions.android.cryptoapp.data.CryptoCurrencyDBHelper;
 import com.etechbusinesssolutions.android.cryptoapp.data.CurrencyHelper;
+import com.etechbusinesssolutions.android.cryptoapp.networkutil.NetworkUtil;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Objects;
 
 public class CardActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -74,10 +87,97 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     private boolean curSpinnerClicked = false;
 
+    /**
+     * Create an instance of the JobScheduler class
+     */
+    JobScheduler mJobScheduler;
+
+    /**
+     * Used to set the menu items
+     */
+    Menu menu = null;
+    /**
+     * Used to check network status
+     */
+    String status;
+
+    /**
+     * Used to check network status
+     */
+    boolean online;
+
+    private static final String MY_INTENT = "com.etechbusinesssolutions.android.cryptoapp.cryptservice.CUSTOM_INTENT";
+    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
+
+    /**
+     * JobScheduler Job ID
+     */
+    private static final int JOB_ID = 1;
+
+    /**
+     * Use this to catch the intent sent from the JobSchedulerService class
+     */
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public IBinder peekService(Context myContext, Intent service) {
+            return super.peekService(myContext, service);
+        }
+
+        @TargetApi(Build.VERSION_CODES.KITKAT)
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            //TODO: Remove
+            Toast.makeText(context, "Intent detected", Toast.LENGTH_SHORT).show();
+
+            if (intent.getAction().equals(MY_INTENT)) {
+
+                //TODO: Remove
+                Toast.makeText(context, "MY_INTENT", Toast.LENGTH_SHORT).show();
+
+                MenuItem refreshMenuItem = menu.findItem(R.id.menu_refresh);
+                refreshMenuItem.setVisible(true);
+//                if ( !getLoaderManager().getLoader(CRYPTOCURRENCY_LOADER_ID).isStarted()) {
+//                    refreshMenuItem.setVisible(false);
+//                }
+
+            }
+
+            // Set the network menu status
+            if (intent.getAction().equals(CONNECTION_INTENT)) {
+
+                //TODO: Remove
+                Toast.makeText(context, "CONNECT_INTENT", Toast.LENGTH_SHORT).show();
+
+                status = NetworkUtil.getConnectivityStatusString(context);
+                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
+                supportInvalidateOptionsMenu();
+
+            }
+        }
+    };
+
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card);
+
+        // Register the intent here
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MY_INTENT);
+        intentFilter.addAction(CONNECTION_INTENT);
+        registerReceiver(this.broadcastReceiver, intentFilter);
+
+        // Initialize JobScheduler
+        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
+                new ComponentName(this, JobSchedulerService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(60000)
+                .build());
 
         Bundle extras = getIntent().getExtras();
 
@@ -412,5 +512,29 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem netMenuItem = menu.findItem(R.id.menu_network_available);
+        MenuItem nonetMenuItem = menu.findItem(R.id.menu_network_absent);
 
+        netMenuItem.setVisible(online);
+        nonetMenuItem.setVisible(!online);
+
+        return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(broadcastReceiver, new IntentFilter(MY_INTENT));
+        registerReceiver(broadcastReceiver, new IntentFilter(CONNECTION_INTENT));
+
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+    }
 }
