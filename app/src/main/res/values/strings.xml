@@ -1,0 +1,35 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" tools:ignore="ExtraTranslation">CryptoMonitorU1</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="title_activity_conversion">ConversionActivity</string>
+    <string name="title_activity_card">CardActivity</string>
+    <string name="currency_value">29304.99</string>
+    <string name="currency_symbol">NGN</string>
+    <string name="currency_logo">₦</string>
+    <string name="conversion_radio_eth_btn">ETH</string>
+    <string name="conversion_radio_btc_btn">BTC</string>
+    <string name="conversion_btc_logo">BTC</string>
+    <string name="default_conversion_result_value">0</string>
+    <string name="convert_btn_text">Convert</string>
+
+    <string name="code_eth_text">ETH</string>
+    <string name="code_btc_text">BTC</string>
+    <string name="no_data">No data available!</string>
+    <string name="empty_view_title_text">Database Outage</string>
+    <string name="empty_view_subtitle_text">It appears we have no data …!</string>
+    <string name="network_absent">no network</string>
+    <string name="network_avalable">network</string>
+    <string name="data_refresh">data Refresh</string>
+    <string-array name="crypto_array">
+        <item>ETH</item>
+        <item>BTC</item>
+    </string-array>
+    <string-array name="currency_symbols">
+        <item></item>
+    </string-array>
+</resources>

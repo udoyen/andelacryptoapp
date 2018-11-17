@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.connectsystems.georgek.cryptomonitoru1">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BtcActivity"
+            android:label="BTC Rates"
+            android:parentActivityName=".HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+        </activity>
+        <activity
+            android:name=".EthActivity"
+            android:label="ETH Rates"
+            android:parentActivityName=".HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+        </activity>
+        <provider
+            android:name=".data.CurrencyProvider"
+            android:authorities="com.connectsystems.georgek.cryptomonitoru1"
+            android:exported="false" />
+        <activity
+            android:name=".cardview.CardActivity"
+            android:label="Currency Rates"
+            android:parentActivityName=".HomeActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+        </activity>
+        <activity
+            android:name=".conversion.ConversionActivity"
+            android:label="Conversion"
+            android:parentActivityName=".HomeActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+
+        </activity>
+        <service
+            android:name=".cryptoservice.JobSchedulerService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+    </application>
+
+</manifest>
