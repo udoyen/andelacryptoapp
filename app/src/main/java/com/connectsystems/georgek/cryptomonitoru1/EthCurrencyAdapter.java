@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import com.connectsystems.georgek.cryptomonitor.data.CryptoContract.CurrencyEntry;
-import com.connectsystems.georgek.cryptomonitor.data.CurrencyHelper;
+
+import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract;
+import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract.CurrencyEntry;
+import com.connectsystems.georgek.cryptomonitoru1.data.CurrencyHelper;
 
 import java.text.DecimalFormat;
 

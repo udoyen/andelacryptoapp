@@ -19,8 +19,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.connectsystems.georgek.cryptomonitor.cardview.CardActivity;
-import com.connectsystems.georgek.cryptomonitor.data.CryptoContract.CurrencyEntry;
+
+import com.connectsystems.georgek.cryptomonitoru1.cardview.CardActivity;
+import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract;
+import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract.CurrencyEntry;
 
 import java.util.Objects;
 
