@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 public class CryptoContract {
-    public static final String CONTENT_AUTHORITY = "com.connectsystems.georgek.cryptomonitor";
+    public static final String CONTENT_AUTHORITY = "com.connectsystems.georgek.cryptomonitoru1";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 

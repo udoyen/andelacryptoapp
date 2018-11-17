@@ -2,6 +2,8 @@ package com.connectsystems.georgek.cryptomonitoru1;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +24,8 @@ import com.connectsystems.georgek.cryptomonitoru1.cardview.CardActivity;
 import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract;
 import com.connectsystems.georgek.cryptomonitoru1.data.CryptoCurrencyDBHelper;
 
+import java.util.Objects;
+
 
 /**
  * Created by george on 10/10/17.
@@ -34,7 +38,7 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
      * Constant value for the github loader ID. We can choose any integer
      * This really comes into play when you're using multiple loaders
      */
-    private static final int DATABASE_LOADER_ID = 3;
+    private static final int ETH_FRAGMENT_LOADER_ID = 3;
 
     /**
      * String to identify intent source
@@ -133,7 +137,7 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
             // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
 
-            loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+            loaderManager.initLoader(ETH_FRAGMENT_LOADER_ID, null, this);
 
 
         }
@@ -194,19 +198,21 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
                 CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE
         };
 
-        return new CursorLoader(getContext(),
+        return new CursorLoader(Objects.requireNonNull(getContext()),
                 CryptoContract.CurrencyEntry.CONTENT_URI,
                 projection,
                 null,
                 null,
                 null
         );
+
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
 
-        mAdapter.swapCursor(data);
+//        mAdapter.swapCursor(data);
+        mAdapter.changeCursor(data);
 
         // Stop the refreshing animation
         mySwipeRefreshLayout.setRefreshing(false);
@@ -220,7 +226,8 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
 
         // Clears out the adapter's reference to the Cursor.
         // This prevents memory leaks.
-        mAdapter.swapCursor(null);
+//        mAdapter.swapCursor(null);
+        mAdapter.changeCursor(null);
 
     }
 
@@ -233,9 +240,13 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
         // because this activity implements the LoaderCallbacks interface).
-        loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+        loaderManager.restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
 
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+    }
 }

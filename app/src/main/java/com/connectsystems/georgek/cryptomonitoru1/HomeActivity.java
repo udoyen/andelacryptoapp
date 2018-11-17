@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.connectsystems.georgek.cryptomonitoru1.cryptoservice.JobSchedulerService;
 import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract;
+import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract.CurrencyEntry;
 import com.connectsystems.georgek.cryptomonitoru1.networkutil.NetworkUtil;
 
 import java.util.IllegalFormatException;
@@ -44,21 +45,6 @@ import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Currency>> {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SimpleFragmentPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
-
     // URL for the currency data from cryptocompare
     private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
     /**
@@ -66,21 +52,17 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      * This really comes into play when you're using multiple loaders
      */
     private static final int CRYPTOCURRENCY_LOADER_ID = 1;
-
     /**
      * JobScheduler Job ID
      */
     private static final int JOB_ID = 1;
     private static final String TAG = HomeActivity.class.getSimpleName();
-
     private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitor.cryptservice.CUSTOM_INTENT";
     private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
-
     /**
      * Create an instance of the JobScheduler class
      */
     JobScheduler mJobScheduler;
-
     /**
      * Used to set the menu items
      */
@@ -89,15 +71,11 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      * Used to check network status
      */
     String status;
-
     /**
      * Used to check network status
      */
     boolean online;
-
     MenuItem refreshMenuItem;
-
-
     /**
      * Use this to catch the intent sent from the JobSchedulerService class
      */
@@ -128,6 +106,20 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         }
     };
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+    private SimpleFragmentPagerAdapter mSectionsPagerAdapter;
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
+    private Cursor mCursor;
 
     private void receiverLoad() {
 
@@ -197,6 +189,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.sliding_tab);
+        tabLayout.setupWithViewPager(mViewPager);
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -231,20 +224,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -315,12 +294,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 try {
                     for (Currency element : data) {
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                        values.put(CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                        values.put(CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                         // Update database
                         getContentResolver().update(
-                                CryptoContract.CurrencyEntry.CONTENT_URI,
+                                CurrencyEntry.CONTENT_URI,
                                 values,
                                 "_id = ?",
                                 new String[]{String.valueOf(element.getcId())}
@@ -354,12 +333,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                     for (Currency element : data) {
 
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                        values.put(CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                        values.put(CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                        values.put(CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                         // Insert data into SQLiteDatabase
-                        getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
+                        getContentResolver().insert(CurrencyEntry.CONTENT_URI, values);
 
 
                     }
@@ -398,6 +377,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(android.content.Loader<List<Currency>> loader) {
 
         getLoaderManager().destroyLoader(CRYPTOCURRENCY_LOADER_ID);
+        mCursor.close();
 
     }
 
@@ -412,18 +392,18 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         String[] projection = {
 
-                CryptoContract.CurrencyEntry._ID,
-                CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME,
-                CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE,
-                CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE
+                CurrencyEntry._ID,
+                CurrencyEntry.COLUMN_CURRENCY_NAME,
+                CurrencyEntry.COLUMN_BTC_VALUE,
+                CurrencyEntry.COLUMN_ETH_VALUE
 
         };
 
-        Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projection, null, null, null);
+        mCursor = getContentResolver().query(CurrencyEntry.CONTENT_URI, projection, null, null, null);
 
-        assert cursor != null;
-        boolean exists = (cursor.getCount() > 0);
-        cursor.close();
+        assert mCursor != null;
+        boolean exists = (mCursor.getCount() > 0);
+        mCursor.close();
 
         return exists;
 

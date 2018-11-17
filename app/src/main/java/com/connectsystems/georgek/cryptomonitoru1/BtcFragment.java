@@ -21,7 +21,6 @@ import android.widget.ProgressBar;
 
 
 import com.connectsystems.georgek.cryptomonitoru1.cardview.CardActivity;
-import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract;
 import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract.CurrencyEntry;
 
 import java.util.Objects;
@@ -37,7 +36,7 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
      * Constant value for the github loader ID. We can choose any integer
      * This really comes into play when you're using multiple loaders
      */
-    private static final int DATABASE_LOADER_ID = 2;
+    private static final int ETH_FRAGMENT_LOADER_ID = 2;
     // String to identify intent source
     private static final String BTC_CODE = "btc_value";
     LoaderManager loaderManager;
@@ -63,7 +62,7 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.currency_base, container, false);
 
@@ -127,7 +126,7 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
             // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
 
-            loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+            loaderManager.initLoader(ETH_FRAGMENT_LOADER_ID, null, this);
 
 
         }
@@ -154,6 +153,12 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
     }
 
     @Override
@@ -200,7 +205,8 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
 
-        mAdapter.swapCursor(data);
+//        mAdapter.swapCursor(data);
+        mAdapter.changeCursor(data);
         // Stop the refreshing animation
         mySwipeRefreshLayout.setRefreshing(false);
 
@@ -213,8 +219,9 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
         // Clears out the adapter's reference to the Cursor.
         // This prevents memory leaks.
-        mAdapter.swapCursor(null);
+//        mAdapter.swapCursor(null);
 
+        mAdapter.changeCursor(null);
     }
 
     public void userPageRefreshAction() {
@@ -226,7 +233,7 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
         // because this activity implements the LoaderCallbacks interface).
-        loaderManager.initLoader(DATABASE_LOADER_ID, null, this);
+        loaderManager.restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
 
     }
 
