@@ -7,7 +7,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingStart="16dp"
-    android:background="@color/base_background"
+    android:background="@android:color/white"
 
     >
 

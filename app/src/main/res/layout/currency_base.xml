@@ -85,6 +85,7 @@
             android:layout_marginBottom="71dp"
             android:clickable="true"
             android:focusable="true"
+            android:tint="@color/colorSecondaryText"
             app:elevation="4dp" />
     </RelativeLayout>
 

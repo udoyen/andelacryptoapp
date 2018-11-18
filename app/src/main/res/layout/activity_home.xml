@@ -31,9 +31,9 @@
             android:id="@+id/sliding_tab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorPrimaryLight"
             app:tabSelectedTextColor="@color/colorPrimaryText"
-            app:tabTextColor="@color/base_background">
+            app:tabTextColor="@color/colorPrimaryText">
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tabItem"
