@@ -58,7 +58,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     private static final int JOB_ID = 1;
     private static final String TAG = HomeActivity.class.getSimpleName();
-    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitor.cryptservice.CUSTOM_INTENT";
+    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
     private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
     /**
      * Create an instance of the JobScheduler class
