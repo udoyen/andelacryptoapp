@@ -71,12 +71,7 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
 
         mFab = rootView.findViewById(R.id.floatingActionButton);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: Scroll to activity top
-            }
-        });
+
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
@@ -172,6 +167,20 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
                 } else if (totalItemCount - visibleItemCount > firstVisibleItem) {
                     mFab.show();
                 }
+            }
+        });
+
+        /*
+          Used this to scroll to the top
+          of the page
+         */
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Scroll to activity top
+                v = listView.getChildAt(0);
+                int offset = (v == null) ? 0 : v.getTop();
+                listView.smoothScrollToPosition(offset);
             }
         });
 
