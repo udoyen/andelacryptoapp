@@ -1,5 +1,6 @@
 package com.connectsystems.georgek.cryptomonitoru1;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.animation.AnimationUtils;
+import android.support.design.widget.FloatingActionButton;
+import android.support.graphics.drawable.AnimationUtilsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -15,6 +19,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -67,6 +72,9 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
      */
     private SwipeRefreshLayout mySwipeRefreshLayout;
 
+    private FloatingActionButton mFab;
+
+
 
     public EthFragment() {
 
@@ -78,6 +86,14 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.currency_base, container, false);
+
+        mFab = rootView.findViewById(R.id.floatingActionButton);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Scroll to activity top
+            }
+        });
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
@@ -143,6 +159,7 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         }
 
 
+
         /*
           Use this code to prevent SwipeRefreshLayout from interfering with
           Scrolling in ListView
@@ -159,7 +176,18 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
                 if (listView.getChildAt(0) != null) {
 
                     mySwipeRefreshLayout.setEnabled(listView.getFirstVisiblePosition() == 0 && listView.getChildAt(0).getTop() == 0);
+                    // Hide floating button when top of activity
+                    // is reached
+                }
 
+                if (firstVisibleItem == 0) {
+                    View v = listView.getChildAt(0);
+                    int offset = (v == null) ? 0 : v.getTop();
+                    if (offset == 0) {
+                        mFab.hide();
+                    }
+                } else if (totalItemCount - visibleItemCount > firstVisibleItem) {
+                    mFab.show();
                 }
             }
         });

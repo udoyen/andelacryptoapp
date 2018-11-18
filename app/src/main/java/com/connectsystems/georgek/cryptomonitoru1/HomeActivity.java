@@ -16,6 +16,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -76,6 +77,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     boolean online;
     MenuItem refreshMenuItem;
+
     /**
      * Use this to catch the intent sent from the JobSchedulerService class
      */
@@ -134,24 +136,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        intentFilterSetup();
 
-        //region intentfilter
-        // Register the intent here
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MY_INTENT);
-        intentFilter.addAction(CONNECTION_INTENT);
-        registerReceiver(this.broadcastReceiver, intentFilter);
-        //endregion
-
-        // Initialize JobScheduler
-        //region jobscheduler
-        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
-                new ComponentName(this, JobSchedulerService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(60000)
-                .build());
-        //endregion
 
         //region network
         // Get a reference to the ConnectivityManager to check state of network connectivity
@@ -178,6 +164,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         setContentView(R.layout.activity_home);
 
+
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -195,6 +184,26 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
 
+    }
+
+    private void intentFilterSetup() {
+        //region intentfilter
+        // Register the intent here
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MY_INTENT);
+        intentFilter.addAction(CONNECTION_INTENT);
+        registerReceiver(this.broadcastReceiver, intentFilter);
+        //endregion
+
+        // Initialize JobScheduler
+        //region jobscheduler
+        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
+                new ComponentName(this, JobSchedulerService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(60000)
+                .build());
+        //endregion
     }
 
 

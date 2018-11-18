@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -55,6 +56,8 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
      */
     private SwipeRefreshLayout mySwipeRefreshLayout;
 
+    private FloatingActionButton mFab;
+
 
     public BtcFragment() {
         // Required empty public constructor
@@ -65,6 +68,15 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.currency_base, container, false);
+
+
+        mFab = rootView.findViewById(R.id.floatingActionButton);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Scroll to activity top
+            }
+        });
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
@@ -147,6 +159,18 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
                 if (listView.getChildAt(0) != null) {
                     mySwipeRefreshLayout.setEnabled(listView.getFirstVisiblePosition() == 0 && listView.getChildAt(0).getTop() == 0);
+                    // Hide floating button when top of activity
+                    // is reached
+                }
+
+                if (firstVisibleItem == 0) {
+                    View v = listView.getChildAt(0);
+                    int offset = (v == null) ? 0 : v.getTop();
+                    if (offset == 0) {
+                        mFab.hide();
+                    }
+                } else if (totalItemCount - visibleItemCount > firstVisibleItem) {
+                    mFab.show();
                 }
             }
         });
@@ -228,6 +252,7 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
 
         // Get a reference to the loader manager in order to interact with loaders
+        //TODO: find out why this is deprecated.
         loaderManager = getLoaderManager();
 
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for

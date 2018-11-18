@@ -29,4 +29,10 @@
         <item name="android:popupBackground">#DFFFFFFF</item>
     </style>
 
+    <style name="addFab" parent="@style/Widget.Design.FloatingActionButton">
+        <item name="srcCompat">@drawable/ic_arrow_upward_black_24dp</item>
+        <item name="android:tint">@android:color/white</item>
+
+    </style>
+
 </resources>
