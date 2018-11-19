@@ -4,14 +4,14 @@
 
     <item
         android:id="@+id/menu_refresh"
-        android:icon="@drawable/api"
+        android:icon="@drawable/ic_upload_and_download"
         android:title="@string/data_refresh"
-        android:visible="false"
+        android:visible="true"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_network_available"
-        android:icon="@drawable/connected"
+        android:icon="@drawable/ic_network_present"
         android:title="@string/network_avalable"
         android:visible="false"
         app:showAsAction="always" />
@@ -19,7 +19,7 @@
 
     <item
         android:id="@+id/menu_network_absent"
-        android:icon="@drawable/disconnected"
+        android:icon="@drawable/ic_network_absent"
         android:title="@string/network_absent"
         android:visible="true"
         app:showAsAction="ifRoom" />

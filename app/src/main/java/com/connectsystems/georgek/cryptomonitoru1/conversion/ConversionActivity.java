@@ -19,6 +19,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 
 import com.connectsystems.georgek.cryptomonitoru1.R;
+import com.connectsystems.georgek.cryptomonitoru1.cardview.CardActivity;
 import com.connectsystems.georgek.cryptomonitoru1.cryptoservice.JobSchedulerService;
 import com.connectsystems.georgek.cryptomonitoru1.data.CryptoCurrencyDBHelper;
 import com.connectsystems.georgek.cryptomonitoru1.networkutil.NetworkUtil;
@@ -42,7 +44,6 @@ import java.util.Objects;
 
 public class ConversionActivity extends AppCompatActivity {
 
-    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitor.cryptservice.CUSTOM_INTENT";
     private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
     /**
      * JobScheduler Job ID
@@ -86,40 +87,7 @@ public class ConversionActivity extends AppCompatActivity {
      * Used to check network status
      */
     boolean online;
-    /**
-     * Use this to catch the intent sent from the JobSchedulerService class
-     */
-    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
-        @Override
-        public IBinder peekService(Context myContext, Intent service) {
-            return super.peekService(myContext, service);
-        }
-
-//        @TargetApi(Build.VERSION_CODES.KITKAT)
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-//
-//            if (Objects.equals(intent.getAction(), MY_INTENT)) {
-//
-//
-//                MenuItem refreshMenuItem = menu.findItem(R.id.menu_refresh);
-//                refreshMenuItem.setVisible(true);
-//
-//            }
-
-            // Set the network menu status
-            if (Objects.equals(intent.getAction(), CONNECTION_INTENT)) {
-
-
-                status = NetworkUtil.getConnectivityStatusString(context);
-                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
-                supportInvalidateOptionsMenu();
-
-            }
-        }
-    };
     /**
      * Radio button state
      */
@@ -130,26 +98,24 @@ public class ConversionActivity extends AppCompatActivity {
     private String code;
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
+    MenuItem refreshMenuItem;
 
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
+
+
+    //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversion);
 
+        mCurrencyUpdateBroadcastReceiver = new CurrencyUpdateBroadcastReceiver();
+
+
         // Register the intent here
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MY_INTENT);
         intentFilter.addAction(CONNECTION_INTENT);
-        registerReceiver(this.broadcastReceiver, intentFilter);
-
-        // Initialize JobScheduler
-        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
-                new ComponentName(this, JobSchedulerService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(60000)
-                .build());
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, intentFilter);
 
         value1 = (EditText) findViewById(R.id.value_to_convert_box);
 
@@ -386,6 +352,7 @@ public class ConversionActivity extends AppCompatActivity {
         //inflate the menu options from the menu xml file
         //This add menu items to the app bar
         getMenuInflater().inflate(R.menu.network_available, menu);
+        menu.findItem(R.id.menu_refresh).setVisible(false);
 
         if (isConnected()) {
             // Let user know the status of the device network
@@ -403,16 +370,34 @@ public class ConversionActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        registerReceiver(broadcastReceiver, new IntentFilter(MY_INTENT));
-        registerReceiver(broadcastReceiver, new IntentFilter(CONNECTION_INTENT));
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, new IntentFilter(CONNECTION_INTENT));
 
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(mCurrencyUpdateBroadcastReceiver);
 
+    }
+
+    // TODO: Correct the spelling
+    private class CurrencyUpdateBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Set the network menu status
+            if (Objects.equals(intent.getAction(), CONNECTION_INTENT)) {
+
+                status = NetworkUtil.getConnectivityStatusString(context);
+                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
+                supportInvalidateOptionsMenu();
+
+            }
+
+
+        }
     }
 
 }

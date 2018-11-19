@@ -15,29 +15,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
-import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import com.connectsystems.georgek.cryptomonitoru1.cryptoservice.JobSchedulerService;
 import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract;
-import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract.CurrencyEntry;
 import com.connectsystems.georgek.cryptomonitoru1.networkutil.NetworkUtil;
 
 import java.util.IllegalFormatException;
@@ -46,68 +36,6 @@ import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Currency>> {
 
-    // URL for the currency data from cryptocompare
-    private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
-    /**
-     * Constant value for the earthquake loader ID. We can choose any integer
-     * This really comes into play when you're using multiple loaders
-     */
-    private static final int CRYPTOCURRENCY_LOADER_ID = 1;
-    /**
-     * JobScheduler Job ID
-     */
-    private static final int JOB_ID = 1;
-    private static final String TAG = HomeActivity.class.getSimpleName();
-    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
-    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
-    /**
-     * Create an instance of the JobScheduler class
-     */
-    JobScheduler mJobScheduler;
-    /**
-     * Used to set the menu items
-     */
-    Menu menu = null;
-    /**
-     * Used to check network status
-     */
-    String status;
-    /**
-     * Used to check network status
-     */
-    boolean online;
-    MenuItem refreshMenuItem;
-
-    /**
-     * Use this to catch the intent sent from the JobSchedulerService class
-     */
-    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-
-        @Override
-        public IBinder peekService(Context myContext, Intent service) {
-            return super.peekService(myContext, service);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-
-            if (Objects.equals(intent.getAction(), MY_INTENT)) {
-
-
-                receiverLoad();
-            }
-
-            // Set the network menu status
-            if (Objects.equals(intent.getAction(), CONNECTION_INTENT)) {
-
-                status = NetworkUtil.getConnectivityStatusString(context);
-                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
-                supportInvalidateOptionsMenu();
-
-            }
-        }
-    };
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -117,11 +45,51 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SimpleFragmentPagerAdapter mSectionsPagerAdapter;
+
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private Cursor mCursor;
+
+    // URL for the currency data from cryptocompare
+    private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
+    /**
+     * Constant value for the earthquake loader ID. We can choose any integer
+     * This really comes into play when you're using multiple loaders
+     */
+    private static final int CRYPTOCURRENCY_LOADER_ID = 1;
+
+    /**
+     * JobScheduler Job ID
+     */
+    private static final int JOB_ID = 1;
+    private static final String TAG = HomeActivity.class.getSimpleName();
+
+    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
+    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
+
+    /**
+     * Create an instance of the JobScheduler class
+     */
+    JobScheduler mJobScheduler;
+
+    /**
+     * Used to set the menu items
+     */
+    Menu menu = null;
+    /**
+     * Used to check network status
+     */
+    String status;
+
+    /**
+     * Used to check network status
+     */
+    boolean online;
+
+    MenuItem refreshMenuItem;
+
+    private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
 
     private void receiverLoad() {
 
@@ -136,8 +104,27 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intentFilterSetup();
 
+        mCurrencyUpdateBroadcastReceiver = new CurrencyUpdateBroadcastReceiver();
+
+
+        //region intentfilter
+        // Register the intent here
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MY_INTENT);
+        intentFilter.addAction(CONNECTION_INTENT);
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, intentFilter);
+        //endregion
+
+        // Initialize JobScheduler
+        //region jobscheduler
+        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
+                new ComponentName(this, JobSchedulerService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(60000) // one minute
+                .build());
+        //endregion
 
         //region network
         // Get a reference to the ConnectivityManager to check state of network connectivity
@@ -164,9 +151,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         setContentView(R.layout.activity_home);
 
-
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -184,26 +168,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
 
-    }
 
-    private void intentFilterSetup() {
-        //region intentfilter
-        // Register the intent here
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MY_INTENT);
-        intentFilter.addAction(CONNECTION_INTENT);
-        registerReceiver(this.broadcastReceiver, intentFilter);
-        //endregion
-
-        // Initialize JobScheduler
-        //region jobscheduler
-        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
-                new ComponentName(this, JobSchedulerService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(60000)
-                .build());
-        //endregion
     }
 
 
@@ -234,6 +199,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem netMenuItem = menu.findItem(R.id.menu_network_available);
@@ -256,8 +222,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onResume() {
         super.onResume();
-        registerReceiver(broadcastReceiver, new IntentFilter(MY_INTENT));
-        registerReceiver(broadcastReceiver, new IntentFilter(CONNECTION_INTENT));
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, new IntentFilter(MY_INTENT));
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, new IntentFilter(CONNECTION_INTENT));
         getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, this);
 
     }
@@ -265,13 +231,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(mCurrencyUpdateBroadcastReceiver);
     }
 
 
     @Override
     public android.content.Loader<List<Currency>> onCreateLoader(int id, Bundle args) {
-
 
         // Setup the baseURI
         Uri baseUri = Uri.parse(CRYPTO_CURRENRY_URL);
@@ -303,12 +268,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 try {
                     for (Currency element : data) {
-                        values.put(CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                         // Update database
                         getContentResolver().update(
-                                CurrencyEntry.CONTENT_URI,
+                                CryptoContract.CurrencyEntry.CONTENT_URI,
                                 values,
                                 "_id = ?",
                                 new String[]{String.valueOf(element.getcId())}
@@ -342,12 +307,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                     for (Currency element : data) {
 
-                        values.put(CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-                        values.put(CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
                         // Insert data into SQLiteDatabase
-                        getContentResolver().insert(CurrencyEntry.CONTENT_URI, values);
+                        getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
 
 
                     }
@@ -386,7 +351,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(android.content.Loader<List<Currency>> loader) {
 
         getLoaderManager().destroyLoader(CRYPTOCURRENCY_LOADER_ID);
-        mCursor.close();
+        refreshMenuItem = menu.findItem(R.id.menu_refresh);
+        refreshMenuItem.setVisible(false);
 
     }
 
@@ -401,22 +367,47 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         String[] projection = {
 
-                CurrencyEntry._ID,
-                CurrencyEntry.COLUMN_CURRENCY_NAME,
-                CurrencyEntry.COLUMN_BTC_VALUE,
-                CurrencyEntry.COLUMN_ETH_VALUE
+                CryptoContract.CurrencyEntry._ID,
+                CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME,
+                CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE,
+                CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE
 
         };
 
-        mCursor = getContentResolver().query(CurrencyEntry.CONTENT_URI, projection, null, null, null);
+        Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projection, null, null, null);
 
-        assert mCursor != null;
-        boolean exists = (mCursor.getCount() > 0);
-        mCursor.close();
+        assert cursor != null;
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
 
         return exists;
 
 
+    }
+
+    // TODO: Correct the spelling
+    private class CurrencyUpdateBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (Objects.equals(intent.getAction(), MY_INTENT)) {
+
+
+                receiverLoad();
+            }
+
+            // Set the network menu status
+            if (Objects.equals(intent.getAction(), CONNECTION_INTENT)) {
+
+                status = NetworkUtil.getConnectivityStatusString(context);
+                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
+                supportInvalidateOptionsMenu();
+
+            }
+
+
+        }
     }
 
 

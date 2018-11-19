@@ -11,7 +11,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 public class SimpleFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
-    final int PAGE_COUNT = 2;
+    private final int PAGE_COUNT = 2;
     private String tabTitles[] = new String[]{"BTC", "ETH"};
     private Context context;
 

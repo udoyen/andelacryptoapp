@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.connectsystems.georgek.cryptomonitoru1.HomeActivity;
 import com.connectsystems.georgek.cryptomonitoru1.R;
 import com.connectsystems.georgek.cryptomonitoru1.conversion.ConversionActivity;
 import com.connectsystems.georgek.cryptomonitoru1.cryptoservice.JobSchedulerService;
@@ -44,7 +45,6 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
     // String to identify intent source
     private static final String ETH_CODE = "eth_value";
     private static final String BTC_CODE = "btc_value";
-    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitor.cryptservice.CUSTOM_INTENT";
     private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
     /**
      * JobScheduler Job ID
@@ -91,32 +91,11 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
      * Used to check network status
      */
     boolean online;
-
-    /**
-     * Use this to catch the intent sent from the JobSchedulerService class
-     */
-    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-
-        @Override
-        public IBinder peekService(Context myContext, Intent service) {
-            return super.peekService(myContext, service);
-        }
-
-//        @TargetApi(Build.VERSION_CODES.KITKAT)
-        @Override
-        public void onReceive(Context context, Intent intent) {
+    MenuItem refreshMenuItem;
+    private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
 
 
-            // Set the network menu status
-            if (Objects.equals(intent.getAction(), CONNECTION_INTENT)) {
 
-                status = NetworkUtil.getConnectivityStatusString(context);
-                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
-                supportInvalidateOptionsMenu();
-
-            }
-        }
-    };
     //Create an instance of CryptoCurrencyDBHelper
     private CryptoCurrencyDBHelper mDBHelper;
     /**
@@ -131,25 +110,18 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
     private boolean curSpinnerClicked = false;
 
 
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card);
+        mCurrencyUpdateBroadcastReceiver = new CurrencyUpdateBroadcastReceiver();
 
         // Register the intent here
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MY_INTENT);
         intentFilter.addAction(CONNECTION_INTENT);
-        registerReceiver(this.broadcastReceiver, intentFilter);
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, intentFilter);
 
-        // Initialize JobScheduler
-        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
-                new ComponentName(this, JobSchedulerService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(60000)
-                .build());
 
         Bundle extras = getIntent().getExtras();
 
@@ -494,6 +466,7 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
         //inflate the menu options from the menu xml file
         //This add menu items to the app bar
         getMenuInflater().inflate(R.menu.network_available, menu);
+        menu.findItem(R.id.menu_refresh).setVisible(false);
         this.menu = menu;
 
         if (isConnected()) {
@@ -523,8 +496,8 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(broadcastReceiver, new IntentFilter(MY_INTENT));
-        registerReceiver(broadcastReceiver, new IntentFilter(CONNECTION_INTENT));
+//        registerReceiver(mCurrencyUpdateBroadcastReceiver, new IntentFilter(MY_INTENT));
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, new IntentFilter(CONNECTION_INTENT));
 
     }
 
@@ -532,7 +505,29 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(mCurrencyUpdateBroadcastReceiver);
     }
+
+    // TODO: Correct the spelling
+    private class CurrencyUpdateBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            // Set the network menu status
+            if (Objects.equals(intent.getAction(), CONNECTION_INTENT)) {
+
+                status = NetworkUtil.getConnectivityStatusString(context);
+                online = (Objects.equals(status, "Wifi enabled") || Objects.equals(status, "Mobile data enabled"));
+                supportInvalidateOptionsMenu();
+
+            }
+
+
+        }
+    }
+
+
 
 }
