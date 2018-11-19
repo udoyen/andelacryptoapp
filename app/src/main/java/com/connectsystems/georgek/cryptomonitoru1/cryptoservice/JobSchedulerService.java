@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 
 public class JobSchedulerService extends JobService {
-    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.cryptoservice.CUSTOM_INTENT";
+    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
     private Handler mJobHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
