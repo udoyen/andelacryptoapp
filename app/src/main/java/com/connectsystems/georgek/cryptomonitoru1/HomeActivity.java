@@ -94,7 +94,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
             if (Objects.equals(intent.getAction(), MY_INTENT)) {
 
-
                 receiverLoad();
             }
 
@@ -128,7 +127,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         refreshMenuItem = menu.findItem(R.id.menu_refresh);
         refreshMenuItem.setVisible(true);
         getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
-        getLoaderManager().getLoader(CRYPTOCURRENCY_LOADER_ID);
+//        getLoaderManager().getLoader(CRYPTOCURRENCY_LOADER_ID);
 
     }
 
@@ -136,7 +135,25 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intentFilterSetup();
+        menu = findViewById(R.id.menu_refresh);
+
+        //region intentfilter
+        // Register the intent here
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MY_INTENT);
+        intentFilter.addAction(CONNECTION_INTENT);
+        registerReceiver(this.broadcastReceiver, intentFilter);
+        //endregion
+
+        // Initialize JobScheduler
+        //region jobscheduler
+        mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        mJobScheduler.schedule(new JobInfo.Builder(JOB_ID,
+                new ComponentName(this, JobSchedulerService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(60000)
+                .build());
+        //endregion
 
 
         //region network
