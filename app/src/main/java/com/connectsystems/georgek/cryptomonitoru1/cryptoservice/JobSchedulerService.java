@@ -33,8 +33,7 @@ public class JobSchedulerService extends JobService {
     }
 
     public void broadcastIntent() {
-        Intent intent = new Intent(String.valueOf(this));
-        intent.setAction(MY_INTENT);
+        Intent intent = new Intent(MY_INTENT);
         getApplicationContext().sendBroadcast(intent);
     }
 

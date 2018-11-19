@@ -9,4 +9,5 @@
     <color name="colorSecondaryDark">#c7a500</color>
     <color name="colorPrimaryText">#ffffff</color>
     <color name="colorSecondaryText">#000000</color>
+    <color name="base_background">#ffffff</color>
 </resources>
