@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -297,16 +298,23 @@ public class ConversionActivity extends AppCompatActivity {
 
         } else {
 
-            Toast.makeText(getApplicationContext(), "Please enter a value in the number box", Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(getApplicationContext(), "Please enter a value in the number box", Toast.LENGTH_LONG);
+            View view = toast.getView();
+            view.setBackground(ContextCompat.getDrawable(this, R.drawable.toast_custom_look));
+            toast.show();
 
         }
 
         // Check if user has selected a crypto currency type
         if (radioBtnState == null || checked == -1) {
 
-            Toast.makeText(ConversionActivity.this,
+            Toast toast = Toast.makeText(ConversionActivity.this,
                     "Please select a crypto currency type to convert to!",
-                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG);
+            View view = toast.getView();
+            view.setBackground(ContextCompat.getDrawable(this, R.drawable.toast_custom_look));
+            toast.show();
+
 
         } else {
 
