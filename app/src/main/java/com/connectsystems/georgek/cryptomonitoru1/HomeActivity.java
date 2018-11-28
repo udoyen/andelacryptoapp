@@ -15,6 +15,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -105,6 +106,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setUpStrictMode();
+
         mCurrencyUpdateBroadcastReceiver = new CurrencyUpdateBroadcastReceiver();
 
 
@@ -169,6 +172,17 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
 
+    }
+
+    private void setUpStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build();
+            StrictMode.setThreadPolicy(policy);
+
+        }
     }
 
 
