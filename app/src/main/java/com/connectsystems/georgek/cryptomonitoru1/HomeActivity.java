@@ -1,5 +1,6 @@
 package com.connectsystems.georgek.cryptomonitoru1;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.job.JobInfo;
@@ -14,7 +15,9 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -90,6 +93,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     MenuItem refreshMenuItem;
 
     private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
+    private boolean mExists;
 
     private void receiverLoad() {
 
@@ -104,6 +108,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+
+        setUpStrictMode();
 
         mCurrencyUpdateBroadcastReceiver = new CurrencyUpdateBroadcastReceiver();
 
@@ -149,7 +156,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         //endregion
 
-        setContentView(R.layout.activity_home);
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -169,6 +176,17 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
 
+    }
+
+    private void setUpStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build();
+            StrictMode.setThreadPolicy(policy);
+
+        }
     }
 
 
@@ -250,13 +268,13 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoadFinished(android.content.Loader<List<Currency>> loader, List<Currency> data) {
+    public void onLoadFinished(android.content.Loader<List<Currency>> loader, final List<Currency> data) {
 
         //Used to delay the API dataload icon on the Actionbar
         final Handler handler = new Handler();
 
         // Create a ContentValues class object
-        ContentValues values = new ContentValues();
+//        ContentValues values = new ContentValues();
 
         // Check if database table already present, if it exists
         // then update current records instead of inserting.
@@ -267,20 +285,34 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
             if (found) {
 
                 try {
-                    for (Currency element : data) {
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-                        // Update database
-                        getContentResolver().update(
-                                CryptoContract.CurrencyEntry.CONTENT_URI,
-                                values,
-                                "_id = ?",
-                                new String[]{String.valueOf(element.getcId())}
-                        );
+                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(ContentValues... contentValues) {
+                            ContentValues contentValues1 = contentValues[0];
+                            for (Currency element : data) {
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+                                // Update database
+                                getContentResolver().update(
+                                        CryptoContract.CurrencyEntry.CONTENT_URI,
+                                        contentValues1,
+                                        "_id = ?",
+                                        new String[]{String.valueOf(element.getcId())}
+                                );
 
 
-                    }
+                            }
+
+                            return null;
+                        }
+                    };
+
+                    ContentValues contentValues = new ContentValues();
+
+                    task.execute(contentValues);
+
 
 
                 } catch (NullPointerException e) {
@@ -305,17 +337,29 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 try {
 
-                    for (Currency element : data) {
+                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task =  new AsyncTask<ContentValues, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(ContentValues... contentValues) {
+                            ContentValues contentValues1 = contentValues[0];
+                            for (Currency element : data) {
 
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-                        // Insert data into SQLiteDatabase
-                        getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
+                                // Insert data into SQLiteDatabase
+                                getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, contentValues1);
 
 
-                    }
+                            }
+                            return null;
+                        }
+                    };
+
+                    ContentValues contentValues = new ContentValues();
+                    task.execute(contentValues);
+
+
 
                 } catch (NullPointerException e) {
 
@@ -365,6 +409,23 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     public boolean isTableExists() {
 
+        @SuppressLint("StaticFieldLeak") AsyncTask<String[], Void, Cursor> task = new AsyncTask<String[], Void, Cursor>() {
+            @Override
+            protected Cursor doInBackground(String[]... strings) {
+                String[] projections = strings[0];
+                Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projections, null, null, null);
+                return cursor;
+            }
+
+            @Override
+            protected void onPostExecute(Cursor cursor) {
+                assert cursor != null;
+                mExists = (cursor.getCount() > 0);
+                cursor.close();
+
+            }
+        };
+
         String[] projection = {
 
                 CryptoContract.CurrencyEntry._ID,
@@ -374,13 +435,11 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         };
 
-        Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projection, null, null, null);
+        task.execute(projection);
 
-        assert cursor != null;
-        boolean exists = (cursor.getCount() > 0);
-        cursor.close();
 
-        return exists;
+
+        return mExists;
 
 
     }
