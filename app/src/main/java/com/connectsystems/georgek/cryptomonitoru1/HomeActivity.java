@@ -93,6 +93,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     MenuItem refreshMenuItem;
 
     private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
+    private boolean mExists;
 
     private void receiverLoad() {
 
@@ -407,6 +408,23 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     public boolean isTableExists() {
 
+        @SuppressLint("StaticFieldLeak") AsyncTask<String[], Void, Cursor> task = new AsyncTask<String[], Void, Cursor>() {
+            @Override
+            protected Cursor doInBackground(String[]... strings) {
+                String[] projections = strings[0];
+                Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projections, null, null, null);
+                return cursor;
+            }
+
+            @Override
+            protected void onPostExecute(Cursor cursor) {
+                assert cursor != null;
+                mExists = (cursor.getCount() > 0);
+                cursor.close();
+
+            }
+        };
+
         String[] projection = {
 
                 CryptoContract.CurrencyEntry._ID,
@@ -416,13 +434,11 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         };
 
-        Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projection, null, null, null);
+        task.execute(projection);
 
-        assert cursor != null;
-        boolean exists = (cursor.getCount() > 0);
-        cursor.close();
 
-        return exists;
+
+        return mExists;
 
 
     }
