@@ -1,5 +1,6 @@
 package com.connectsystems.georgek.cryptomonitoru1;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.job.JobInfo;
@@ -14,6 +15,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
@@ -264,7 +266,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoadFinished(android.content.Loader<List<Currency>> loader, List<Currency> data) {
+    public void onLoadFinished(android.content.Loader<List<Currency>> loader, final List<Currency> data) {
 
         //Used to delay the API dataload icon on the Actionbar
         final Handler handler = new Handler();
@@ -281,20 +283,34 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
             if (found) {
 
                 try {
-                    for (Currency element : data) {
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-                        // Update database
-                        getContentResolver().update(
-                                CryptoContract.CurrencyEntry.CONTENT_URI,
-                                values,
-                                "_id = ?",
-                                new String[]{String.valueOf(element.getcId())}
-                        );
+                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(ContentValues... contentValues) {
+                            ContentValues contentValues1 = contentValues[0];
+                            for (Currency element : data) {
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+                                // Update database
+                                getContentResolver().update(
+                                        CryptoContract.CurrencyEntry.CONTENT_URI,
+                                        contentValues1,
+                                        "_id = ?",
+                                        new String[]{String.valueOf(element.getcId())}
+                                );
 
 
-                    }
+                            }
+
+                            return null;
+                        }
+                    };
+
+                    ContentValues contentValues = new ContentValues();
+
+                    task.execute(contentValues);
+
 
 
                 } catch (NullPointerException e) {
@@ -319,17 +335,29 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 try {
 
-                    for (Currency element : data) {
+                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task =  new AsyncTask<ContentValues, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(ContentValues... contentValues) {
+                            ContentValues contentValues1 = contentValues[0];
+                            for (Currency element : data) {
 
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                        values.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-                        // Insert data into SQLiteDatabase
-                        getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, values);
+                                // Insert data into SQLiteDatabase
+                                getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, contentValues1);
 
 
-                    }
+                            }
+                            return null;
+                        }
+                    };
+
+                    ContentValues contentValues = new ContentValues();
+                    task.execute(contentValues);
+
+
 
                 } catch (NullPointerException e) {
 
