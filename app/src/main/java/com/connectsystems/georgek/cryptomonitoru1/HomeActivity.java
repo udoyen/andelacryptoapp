@@ -273,7 +273,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         final Handler handler = new Handler();
 
         // Create a ContentValues class object
-        ContentValues values = new ContentValues();
+//        ContentValues values = new ContentValues();
 
         // Check if database table already present, if it exists
         // then update current records instead of inserting.

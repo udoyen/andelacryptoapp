@@ -1,5 +1,6 @@
 package com.connectsystems.georgek.cryptomonitoru1.cardview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.job.JobInfo;
@@ -12,6 +13,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -108,11 +110,14 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
      * was drawn for the first time
      */
     private boolean curSpinnerClicked = false;
+    private String mCode;
+    private int mCurrencyValueIndexBtc;
+    private int mCurrencyValueIndexEth;
 
 
     //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card);
         mCurrencyUpdateBroadcastReceiver = new CurrencyUpdateBroadcastReceiver();
@@ -159,7 +164,7 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
                 // Get the item that was selected or clicked
-                String code = parent.getItemAtPosition(position).toString();
+                mCode = parent.getItemAtPosition(position).toString();
 
 
                 mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
@@ -177,7 +182,36 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     if (currency_code.equals(ETH_CODE)) {
 
-                        double ethValue = 0;
+                        final double[] ethValue = {0};
+
+                        @SuppressLint("StaticFieldLeak") AsyncTask<String[], Void, Cursor> task = new AsyncTask<String[], Void, Cursor>() {
+                            @Override
+                            protected Cursor doInBackground(String[]... strings) {
+                                String[] sValues = strings[0];
+                                Cursor cursor = getApplicationContext().getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI,
+                                        sValues,
+                                        "cur_name = ?",
+                                        new String[]{mCode},
+                                        null);
+                                assert cursor != null;
+                                mCurrencyValueIndexEth = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE);
+                                return cursor;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Cursor cursor) {
+                                if (cursor.moveToFirst()) {
+                                    ethValue[0] = cursor.getDouble(mCurrencyValueIndexEth);
+                                }
+
+                                curValue.setText(df.format(ethValue[0]));
+                                logoText.setText(CurrencyHelper.getCurrencySymbol(mCode));
+                                // Top image for CardView
+                                cryptImage.setImageResource(R.drawable.ethereum);
+                                cursor.close();
+                            }
+                        };
+
 
 
                         //String value = mDBHelper.getCurrencyValue(code, ETH_CODE);
@@ -185,47 +219,53 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                                 CryptoContract.CurrencyEntry._ID,
                                 CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE
                         };
-                        Cursor cursor = getApplicationContext().getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI,
-                                projection,
-                                "cur_name = ?",
-                                new String[]{code},
-                                null);
-                        assert cursor != null;
-                        int currencyValueIndex = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE);
-                        if (cursor.moveToFirst()) {
-                            ethValue = cursor.getDouble(currencyValueIndex);
-                        }
 
-                        curValue.setText(df.format(ethValue));
-                        logoText.setText(CurrencyHelper.getCurrencySymbol(code));
-                        // Top image for CardView
-                        cryptImage.setImageResource(R.drawable.ethereum);
-                        cursor.close();
+                        task.execute(projection);
+
+
+
 
                     }
                     if (currency_code.equals(BTC_CODE)) {
 
-                        double btcValue = 0;
+                        final double[] btcValue = {0};
+
+                        @SuppressLint("StaticFieldLeak") AsyncTask<String[], Void, Cursor> task = new AsyncTask<String[], Void, Cursor>() {
+                            @Override
+                            protected Cursor doInBackground(String[]... strings) {
+                                String[] sValues = strings[0];
+                                Cursor cursor = getApplicationContext().getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI,
+                                        sValues,
+                                        "cur_name = ?",
+                                        new String[]{mCode},
+                                        null);
+                                assert cursor != null;
+                                mCurrencyValueIndexBtc = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE);
+                                return cursor;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Cursor cursor) {
+                                if (cursor.moveToFirst()) {
+                                    btcValue[0] = cursor.getDouble(mCurrencyValueIndexBtc);
+                                }
+                                curValue.setText(df.format(btcValue[0]));
+                                logoText.setText(CurrencyHelper.getCurrencySymbol(mCode));
+                                // Top image for CardView
+                                cryptImage.setImageResource(R.drawable.bitcoin);
+                                cursor.close();
+                            }
+                        };
 
                         String[] projection = {
                                 CryptoContract.CurrencyEntry._ID,
                                 CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE
                         };
-                        Cursor cursor = getApplicationContext().getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI,
-                                projection,
-                                "cur_name = ?",
-                                new String[]{code},
-                                null);
-                        assert cursor != null;
-                        int currencyValueIndex = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE);
-                        if (cursor.moveToFirst()) {
-                            btcValue = cursor.getDouble(currencyValueIndex);
-                        }
-                        curValue.setText(df.format(btcValue));
-                        logoText.setText(CurrencyHelper.getCurrencySymbol(code));
-                        // Top image for CardView
-                        cryptImage.setImageResource(R.drawable.bitcoin);
-                        cursor.close();
+
+                        task.execute(projection);
+
+
+
 
                     }
                 }
