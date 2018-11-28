@@ -1,5 +1,6 @@
 package com.connectsystems.georgek.cryptomonitoru1.conversion;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -101,6 +103,11 @@ public class ConversionActivity extends AppCompatActivity {
     MenuItem refreshMenuItem;
 
     private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
+    private double mValue;
+    private double mCal;
+    private String mResult;
+    private DecimalFormat mDf;
+    private TextView mResultTextView;
 
 
     //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -181,21 +188,33 @@ public class ConversionActivity extends AppCompatActivity {
 
     private void loadSpinnerData() {
 
+
+        @SuppressLint("StaticFieldLeak") AsyncTask<CryptoCurrencyDBHelper, Void, List<String>> task = new AsyncTask<CryptoCurrencyDBHelper, Void, List<String>>() {
+            @Override
+            protected List<String> doInBackground(CryptoCurrencyDBHelper... cryptoCurrencyDBHelpers) {
+                CryptoCurrencyDBHelper cryptoCurrencyDBHelper = cryptoCurrencyDBHelpers[0];
+                // Spinner dropdown elements
+                List<String> codes = cryptoCurrencyDBHelper.getAllCurrencyCodeNames();
+                return codes;
+            }
+
+            @Override
+            protected void onPostExecute(List<String> strings) {
+
+                // Create adapter for spinner
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                        android.R.layout.simple_spinner_item, strings);
+
+                // Dropdown layer style
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                // Attach dataAdapter to spinner
+                spinner.setAdapter(dataAdapter);
+            }
+        };
+
         mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
-
-        // Spinner dropdown elements
-        List<String> codes = mDBHelper.getAllCurrencyCodeNames();
-
-
-        // Create adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, codes);
-
-        // Dropdown layer style
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Attach dataAdapter to spinner
-        spinner.setAdapter(dataAdapter);
+        task.execute(mDBHelper);
 
     }
 
@@ -255,7 +274,6 @@ public class ConversionActivity extends AppCompatActivity {
     public void conversion() {
 
         // Calculation result
-        double cal;
 
         // Create a radio button object
         RadioGroup rBtn = (RadioGroup) findViewById(R.id.radio_container);
@@ -267,7 +285,7 @@ public class ConversionActivity extends AppCompatActivity {
 
 
         // Grab the TextViews to update
-        TextView resultTextView = (TextView) findViewById(R.id.conversion_value);
+        mResultTextView = (TextView) findViewById(R.id.conversion_value);
 
 
         //Checked to make sure user input isn't empty
@@ -283,8 +301,6 @@ public class ConversionActivity extends AppCompatActivity {
 
         }
 
-        String result;
-
         // Check if user has selected a crypto currency type
         if (radioBtnState == null || checked == -1) {
 
@@ -297,20 +313,37 @@ public class ConversionActivity extends AppCompatActivity {
             try {
 
                 // Format to use for calculated conversion
-                DecimalFormat df = new DecimalFormat("#,###.###");
-
-                // Get the value of the currency from tha database
-                double value = Double.parseDouble(mDBHelper.getCurrencyValue(code, radioBtnState));
+                mDf = new DecimalFormat("#,###.###");
 
 
-                // Calculate the conversion rate
-                cal = userInput / value;
+                @SuppressLint("StaticFieldLeak") AsyncTask<CryptoCurrencyDBHelper, Void, String> task = new AsyncTask<CryptoCurrencyDBHelper, Void, String>() {
+                    @Override
+                    protected String doInBackground(CryptoCurrencyDBHelper... cryptoCurrencyDBHelpers) {
+                        CryptoCurrencyDBHelper cryptoCurrencyDBHelper = cryptoCurrencyDBHelpers[0];
+                        String cValue = cryptoCurrencyDBHelper.getCurrencyValue(code, radioBtnState);
+                        return cValue;
+                    }
 
-                // Used to format the calculation output
-                result = df.format(cal);
+                    @Override
+                    protected void onPostExecute(String s) {
+                        // Get the value of the currency from tha database
+                        mValue = Double.parseDouble(s);
+                        // Calculate the conversion rate
+                        mCal = userInput / mValue;
 
-                //Set the Conversion Result TextView
-                resultTextView.setText(result);
+                        // Used to format the calculation output
+                        mResult = mDf.format(mCal);
+
+                        //Set the Conversion Result TextView
+                        mResultTextView.setText(mResult);
+
+                    }
+                };
+
+
+                CryptoCurrencyDBHelper cryptoCurrencyDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
+
+                task.execute(cryptoCurrencyDBHelper);
 
 
             } catch (NumberFormatException e) {

@@ -108,6 +108,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
 
         setUpStrictMode();
 
@@ -155,7 +156,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         //endregion
 
-        setContentView(R.layout.activity_home);
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

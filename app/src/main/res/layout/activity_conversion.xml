@@ -92,7 +92,7 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:text="@string/default_conversion_result_value"
-                        android:textColor="@color/colorPrimaryText"
+                        android:textColor="@color/colorSecondaryText"
                         android:textSize="26sp" />
 
                 </LinearLayout>
