@@ -14,6 +14,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.Menu;
@@ -163,6 +164,7 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 // Get the item that was selected or clicked
                 mCode = parent.getItemAtPosition(position).toString();
+                ((TextView) parent.getChildAt(0)).setTextColor(ResourcesCompat.getColor(getResources(), R.color.colorSecondaryText, null));
 
 
                 mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
