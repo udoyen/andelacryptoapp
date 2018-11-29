@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -28,6 +29,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.connectsystems.georgek.cryptomonitoru1.cryptoservice.JobSchedulerService;
 import com.connectsystems.georgek.cryptomonitoru1.data.CryptoContract;
@@ -164,6 +167,10 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         } else {
             startedWithNetwork = false;
+            Toast toast = Toast.makeText(getApplicationContext(), "Please activate your network to download currency values!", Toast.LENGTH_LONG);
+            View view = toast.getView();
+            view.setBackground(ContextCompat.getDrawable(HomeActivity.this, R.drawable.toast_custom_look));
+            toast.show();
         }
         //endregion
 
@@ -377,7 +384,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                                 }
                             } catch (Exception e) {
+
                                 e.printStackTrace();
+
                             }
                             return null;
                         }
