@@ -6,7 +6,7 @@
         android:id="@+id/menu_refresh"
         android:icon="@drawable/ic_upload_and_download"
         android:title="@string/data_refresh"
-        android:visible="true"
+        android:visible="false"
         app:showAsAction="always" />
 
     <item
