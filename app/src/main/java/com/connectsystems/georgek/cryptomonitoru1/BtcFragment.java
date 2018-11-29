@@ -1,7 +1,12 @@
 package com.connectsystems.georgek.cryptomonitoru1;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -57,6 +62,8 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
     private SwipeRefreshLayout mySwipeRefreshLayout;
 
     private FloatingActionButton mFab;
+    private BtcCurrencyUpdateBroadcastReceiver mBtcCurrencyUpdateBroadcastReceiver;
+//    private boolean startedWithNetwork;
 
 
     public BtcFragment() {
@@ -68,6 +75,22 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.currency_base, container, false);
+
+        // Register the intent here
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(HomeActivity.MY_INTENT);
+        Objects.requireNonNull(getActivity()).registerReceiver(mBtcCurrencyUpdateBroadcastReceiver, intentFilter);
+
+        mBtcCurrencyUpdateBroadcastReceiver =  new BtcCurrencyUpdateBroadcastReceiver();
+
+        // Get a reference to the ConnectivityManager to check state of network connectivity
+        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+
+        //check internet connection
+        NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
+
+        HomeActivity.startedWithNetwork = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
 
         mFab = rootView.findViewById(R.id.floatingActionButton);
@@ -133,7 +156,18 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
             // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
 
-            loaderManager.initLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+            if (HomeActivity.startedWithNetwork) {
+                loaderManager.initLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+                // Notify listview of data changes in adapter
+                mAdapter.notifyDataSetChanged();
+
+            } else {
+                loaderManager.restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+                // Notify listview of data changes in adapter
+                mAdapter.notifyDataSetChanged();
+
+            }
+
 
 
         }
@@ -191,7 +225,26 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
     @Override
     public void onResume() {
         super.onResume();
+        Objects.requireNonNull(getActivity()).registerReceiver(mBtcCurrencyUpdateBroadcastReceiver, new IntentFilter(HomeActivity.MY_INTENT));
         getLoaderManager().restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+        // Notify listview of data changes in adapter
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Objects.requireNonNull(getActivity()).registerReceiver(mBtcCurrencyUpdateBroadcastReceiver, new IntentFilter(HomeActivity.MY_INTENT));
+        getLoaderManager().restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+        // Notify listview of data changes in adapter
+        mAdapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Objects.requireNonNull(getActivity()).unregisterReceiver(mBtcCurrencyUpdateBroadcastReceiver);
     }
 
     @Override
@@ -257,6 +310,7 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mAdapter.changeCursor(null);
     }
 
+    // TODO: Set this up properly
     public void userPageRefreshAction() {
 
 
@@ -264,12 +318,55 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
         //TODO: find out why this is deprecated.
         loaderManager = getLoaderManager();
 
-        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-        // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-        // because this activity implements the LoaderCallbacks interface).
-        loaderManager.restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+        if (HomeActivity.startedWithNetwork) {
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            loaderManager.restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+            // Notify listview of data changes in adapter
+            mAdapter.notifyDataSetChanged();
+        } else {
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            loaderManager.initLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+            // Notify listview of data changes in adapter
+            mAdapter.notifyDataSetChanged();
+        }
+
+
 
     }
+
+    private void receiverLoad() {
+        if (HomeActivity.startedWithNetwork) {
+            getLoaderManager().restartLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+
+        }  else {
+            getLoaderManager().initLoader(ETH_FRAGMENT_LOADER_ID, null, this);
+
+        }
+        getLoaderManager().getLoader(ETH_FRAGMENT_LOADER_ID);
+    }
+
+    private class BtcCurrencyUpdateBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (Objects.equals(intent.getAction(), HomeActivity.MY_INTENT)) {
+
+
+                receiverLoad();
+            }
+
+
+
+        }
+
+
+    }
+
 
 
 }

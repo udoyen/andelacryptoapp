@@ -68,7 +68,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int JOB_ID = 1;
     private static final String TAG = HomeActivity.class.getSimpleName();
 
-    private static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
+    public static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
     private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
 
     /**
@@ -94,12 +94,20 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
     private boolean mExists;
+    public static boolean startedWithNetwork;
 
     private void receiverLoad() {
 
-        refreshMenuItem = menu.findItem(R.id.menu_refresh);
-        refreshMenuItem.setVisible(true);
-        getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+
+        if (startedWithNetwork) {
+            refreshMenuItem = menu.findItem(R.id.menu_refresh);
+            refreshMenuItem.setVisible(true);
+            getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+
+        }  else {
+            getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
+
+        }
         getLoaderManager().getLoader(CRYPTOCURRENCY_LOADER_ID);
 
     }
@@ -141,6 +149,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         NetworkInfo activeNetwork = connMgr.getActiveNetworkInfo();
 
         if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+            startedWithNetwork = true;
 
 
             //call.run();
@@ -153,6 +162,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
             // because this activity implements the LoaderCallbacks interface).
             loaderManager.initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
 
+        } else {
+            startedWithNetwork = false;
         }
         //endregion
 
@@ -247,6 +258,14 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, new IntentFilter(MY_INTENT));
+        registerReceiver(mCurrencyUpdateBroadcastReceiver, new IntentFilter(CONNECTION_INTENT));
+        getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, this);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mCurrencyUpdateBroadcastReceiver);
@@ -290,19 +309,23 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
                         @Override
                         protected Void doInBackground(ContentValues... contentValues) {
                             ContentValues contentValues1 = contentValues[0];
-                            for (Currency element : data) {
-                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                            try {
+                                for (Currency element : data) {
+                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-                                // Update database
-                                getContentResolver().update(
-                                        CryptoContract.CurrencyEntry.CONTENT_URI,
-                                        contentValues1,
-                                        "_id = ?",
-                                        new String[]{String.valueOf(element.getcId())}
-                                );
+                                    // Update database
+                                    getContentResolver().update(
+                                            CryptoContract.CurrencyEntry.CONTENT_URI,
+                                            contentValues1,
+                                            "_id = ?",
+                                            new String[]{String.valueOf(element.getcId())}
+                                    );
 
 
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
 
                             return null;
@@ -341,16 +364,20 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
                         @Override
                         protected Void doInBackground(ContentValues... contentValues) {
                             ContentValues contentValues1 = contentValues[0];
-                            for (Currency element : data) {
+                            try {
+                                for (Currency element : data) {
 
-                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-                                // Insert data into SQLiteDatabase
-                                getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, contentValues1);
+                                    // Insert data into SQLiteDatabase
+                                    getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, contentValues1);
 
 
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                             return null;
                         }
@@ -444,7 +471,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
-    // TODO: Correct the spelling
     private class CurrencyUpdateBroadcastReceiver extends BroadcastReceiver {
 
         @Override
@@ -452,7 +478,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
             if (Objects.equals(intent.getAction(), MY_INTENT)) {
 
-
+                startedWithNetwork = true;
                 receiverLoad();
             }
 
