@@ -132,7 +132,7 @@ public class EthFragment extends Fragment implements LoaderManager.LoaderCallbac
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
         listView.setAdapter(mAdapter);
-        // Notify listview of data channges on adapter
+        // Notify listview of data changes on adapter
         mAdapter.notifyDataSetChanged();
 
 
