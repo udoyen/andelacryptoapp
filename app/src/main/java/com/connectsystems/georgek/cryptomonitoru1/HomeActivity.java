@@ -97,6 +97,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
     private boolean mExists;
+    boolean found;
     public static boolean startedWithNetwork;
 
     private void receiverLoad() {
@@ -107,7 +108,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
             refreshMenuItem.setVisible(true);
             getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
 
-        }  else {
+        } else {
             getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
 
         }
@@ -175,7 +176,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         //endregion
 
 
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -191,7 +191,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-
 
 
     }
@@ -233,7 +232,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         return true;
     }
-
 
 
     @Override
@@ -296,16 +294,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(android.content.Loader<List<Currency>> loader, final List<Currency> data) {
 
-        //Used to delay the API dataload icon on the Actionbar
+        //Used to delay the API data load icon on the Actionbar
         final Handler handler = new Handler();
-
-        // Create a ContentValues class object
-//        ContentValues values = new ContentValues();
 
         // Check if database table already present, if it exists
         // then update current records instead of inserting.
-        boolean found = isTableExists();
-
+        found = isTableExists();
         try {
 
             if (found) {
@@ -344,7 +338,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
                     task.execute(contentValues);
 
 
-
                 } catch (NullPointerException e) {
 
                     Log.i("Error", "Update error iterating over the data ... " + e);
@@ -367,7 +360,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 try {
 
-                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task =  new AsyncTask<ContentValues, Void, Void>() {
+                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
                         @Override
                         protected Void doInBackground(ContentValues... contentValues) {
                             ContentValues contentValues1 = contentValues[0];
@@ -394,7 +387,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
                     ContentValues contentValues = new ContentValues();
                     task.execute(contentValues);
-
 
 
                 } catch (NullPointerException e) {
@@ -441,28 +433,11 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      * Used to determine if the database exists
      * so either an update is done or insert.
      *
-     * @return true
+     * @return boolean
      */
     public boolean isTableExists() {
-
-        @SuppressLint("StaticFieldLeak") AsyncTask<String[], Void, Cursor> task = new AsyncTask<String[], Void, Cursor>() {
-            @Override
-            protected Cursor doInBackground(String[]... strings) {
-                String[] projections = strings[0];
-                Cursor cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projections, null, null, null);
-                return cursor;
-            }
-
-            @Override
-            protected void onPostExecute(Cursor cursor) {
-                assert cursor != null;
-                mExists = (cursor.getCount() > 0);
-                cursor.close();
-
-            }
-        };
-
-        String[] projection = {
+        Cursor cursor;
+        String[] projections = {
 
                 CryptoContract.CurrencyEntry._ID,
                 CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME,
@@ -471,9 +446,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         };
 
-        task.execute(projection);
-
-
+        cursor = getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI, projections, null, null, null);
+        assert cursor != null;
+        mExists = (cursor.getCount() > 0);
 
         return mExists;
 
@@ -503,7 +478,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
         }
     }
-
 
 
 }
