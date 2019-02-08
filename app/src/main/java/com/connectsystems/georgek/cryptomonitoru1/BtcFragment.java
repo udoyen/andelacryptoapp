@@ -168,8 +168,6 @@ public class BtcFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
             }
 
-
-
         }
 
 
