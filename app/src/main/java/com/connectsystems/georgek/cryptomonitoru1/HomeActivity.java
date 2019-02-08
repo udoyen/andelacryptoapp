@@ -314,8 +314,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
                                         "_id = ?",
                                         new String[]{String.valueOf(element.getcId())}
                                 );
-
-
                             }
                         } catch (NullPointerException e) {
 
