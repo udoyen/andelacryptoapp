@@ -344,7 +344,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
                                 contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
                                 contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
                                 contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
-
                                 // Insert data into SQLiteDatabase
                                 getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, contentValues1);
 
