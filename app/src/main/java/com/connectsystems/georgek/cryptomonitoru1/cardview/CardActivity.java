@@ -173,70 +173,11 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     spinner.setSelection(columnPosition - 1);
                     spinnerChecker();
-
                 }
 
                 if (currency_code != null) {
-
                     spinnerItemSelectAction();
-
-
-//                    if (currency_code.equals(ETH_CODE)) {
-//
-//                        final double[] ethValue = {0};
-//                        String[] projection = {
-//                                CryptoContract.CurrencyEntry._ID,
-//                                CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE
-//                        };
-//
-//                        Cursor cursor = getApplicationContext().getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI,
-//                                projection,
-//                                "cur_name = ?",
-//                                new String[]{mCode},
-//                                null);
-//                        assert cursor != null;
-//                        mCurrencyValueIndexEth1 = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE);
-//
-//                        if (cursor.moveToFirst()) {
-//                            ethValue[0] = cursor.getDouble(mCurrencyValueIndexEth1);
-//                        }
-//
-//                        curValue.setText(df.format(ethValue[0]));
-//                        logoText.setText(CurrencyHelper.getCurrencySymbol(mCode));
-//                        // Top image for CardView
-//                        cryptImage.setImageResource(R.drawable.ethereum);
-//                        cursor.close();
-//                    }
-//
-//                    if (currency_code.equals(BTC_CODE)) {
-//
-//                        final double[] btcValue = {0};
-//                        String[] projection = {
-//                                CryptoContract.CurrencyEntry._ID,
-//                                CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE
-//                        };
-//
-//                        Cursor cursor = getApplicationContext().getContentResolver().query(CryptoContract.CurrencyEntry.CONTENT_URI,
-//                                projection,
-//                                "cur_name = ?",
-//                                new String[]{mCode},
-//                                null);
-//                        assert cursor != null;
-//                        mCurrencyValueIndexBtc = cursor.getColumnIndex(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE);
-//
-//                        if (cursor.moveToFirst()) {
-//                            btcValue[0] = cursor.getDouble(mCurrencyValueIndexBtc);
-//                        }
-//                        curValue.setText(df.format(btcValue[0]));
-//                        logoText.setText(CurrencyHelper.getCurrencySymbol(mCode));
-//                        // Top image for CardView
-//                        cryptImage.setImageResource(R.drawable.bitcoin);
-//                        cursor.close();
-//
-//                    }
-//
                 }
-
             }
 
             @Override
@@ -261,9 +202,7 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                 mCode1 = spinner.getSelectedItem().toString();
                 String cryptSelected = parent.getItemAtPosition(position).toString();
 
-
                 mDBHelper = new CryptoCurrencyDBHelper(getApplicationContext());
-
 
                 if (!curSpinnerClicked) {
 
@@ -272,14 +211,11 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                         if (currency_code.equals(ETH_CODE)) {
 
                             curSpinner.setSelection(0);
-
                         }
                         if (currency_code.equals(BTC_CODE)) {
 
                             curSpinner.setSelection(1);
-
                         }
-
 
                     }
 
@@ -299,7 +235,6 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                         currency_code = "btc_value";
                     }
                 }
-
 
                 if (currency_code != null) {
 
@@ -416,7 +351,6 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                             "cur_name = ?",
                             new String[]{mCode1},
                             null);
-
                 }
 
                 if (currency_code.equals(BTC_CODE)) {
@@ -507,8 +441,6 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void loadCryptoSpinner() {
-
-
         // Create an adapter from the string array resource and use
         // android's inbuilt layout file simple_spinner_item
         // that represents the default spinner in the UI
