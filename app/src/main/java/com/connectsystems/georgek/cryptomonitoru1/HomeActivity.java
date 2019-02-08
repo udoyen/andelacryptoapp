@@ -42,6 +42,39 @@ import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Currency>> {
 
+    public static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
+    // URL for the currency data from cryptocompare
+    private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
+    /**
+     * Constant value for the earthquake loader ID. We can choose any integer
+     * This really comes into play when you're using multiple loaders
+     */
+    private static final int CRYPTOCURRENCY_LOADER_ID = 1;
+    /**
+     * JobScheduler Job ID
+     */
+    private static final int JOB_ID = 1;
+    private static final String TAG = HomeActivity.class.getSimpleName();
+    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
+    public static boolean startedWithNetwork;
+    /**
+     * Create an instance of the JobScheduler class
+     */
+    JobScheduler mJobScheduler;
+    /**
+     * Used to set the menu items
+     */
+    Menu menu = null;
+    /**
+     * Used to check network status
+     */
+    String status;
+    /**
+     * Used to check network status
+     */
+    boolean online;
+    MenuItem refreshMenuItem;
+    boolean found;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -51,68 +84,27 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SimpleFragmentPagerAdapter mSectionsPagerAdapter;
-
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-
-    // URL for the currency data from cryptocompare
-    private static final String CRYPTO_CURRENRY_URL = "https://min-api.cryptocompare.com/data/pricemulti";
-    /**
-     * Constant value for the earthquake loader ID. We can choose any integer
-     * This really comes into play when you're using multiple loaders
-     */
-    private static final int CRYPTOCURRENCY_LOADER_ID = 1;
-
-    /**
-     * JobScheduler Job ID
-     */
-    private static final int JOB_ID = 1;
-    private static final String TAG = HomeActivity.class.getSimpleName();
-
-    public static final String MY_INTENT = "com.connectsystems.georgek.cryptomonitoru1.CUSTOM_INTENT";
-    private static final String CONNECTION_INTENT = "android.net.conn.CONNECTIVITY_CHANGE";
-
-    /**
-     * Create an instance of the JobScheduler class
-     */
-    JobScheduler mJobScheduler;
-
-    /**
-     * Used to set the menu items
-     */
-    Menu menu = null;
-    /**
-     * Used to check network status
-     */
-    String status;
-
-    /**
-     * Used to check network status
-     */
-    boolean online;
-
-    MenuItem refreshMenuItem;
-
     private CurrencyUpdateBroadcastReceiver mCurrencyUpdateBroadcastReceiver;
     private boolean mExists;
-    boolean found;
-    public static boolean startedWithNetwork;
 
     private void receiverLoad() {
 
+        refreshMenuItem = menu.findItem(R.id.menu_refresh);
+        getLoaderManager().getLoader(CRYPTOCURRENCY_LOADER_ID);
 
         if (startedWithNetwork) {
-            refreshMenuItem = menu.findItem(R.id.menu_refresh);
             refreshMenuItem.setVisible(true);
             getLoaderManager().restartLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
 
         } else {
+            refreshMenuItem.setVisible(false);
             getLoaderManager().initLoader(CRYPTOCURRENCY_LOADER_ID, null, HomeActivity.this);
 
         }
-        getLoaderManager().getLoader(CRYPTOCURRENCY_LOADER_ID);
 
     }
 
@@ -220,10 +212,14 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
                 // Let user know the status of the device network
                 menu.findItem(R.id.menu_network_available).setVisible(true);
                 menu.findItem(R.id.menu_network_absent).setVisible(false);
+                //Remove the API call icon in Actionbar
+                menu.findItem(R.id.menu_refresh).setVisible(true);
             } else {
                 // Let user know the status of the device network
                 menu.findItem(R.id.menu_network_available).setVisible(false);
                 menu.findItem(R.id.menu_network_absent).setVisible(true);
+                //Remove the API call icon in Actionbar
+                menu.findItem(R.id.menu_refresh).setVisible(false);
             }
 
 
@@ -297,125 +293,97 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         //Used to delay the API data load icon on the Actionbar
         final Handler handler = new Handler();
 
-        // Check if database table already present, if it exists
-        // then update current records instead of inserting.
-        found = isTableExists();
-        try {
-
-            if (found) {
-
+        @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
+            @Override
+            protected Void doInBackground(ContentValues... contentValues) {
+                ContentValues contentValues1 = contentValues[0];
                 try {
+                    // Check if database table already present, if it exists
+                    // then update current records instead of inserting.
+                    found = isConnected();
+                    if (found) {
+                        try {
+                            for (Currency element : data) {
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
 
-                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(ContentValues... contentValues) {
-                            ContentValues contentValues1 = contentValues[0];
-                            try {
-                                for (Currency element : data) {
-                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
-
-                                    // Update database
-                                    getContentResolver().update(
-                                            CryptoContract.CurrencyEntry.CONTENT_URI,
-                                            contentValues1,
-                                            "_id = ?",
-                                            new String[]{String.valueOf(element.getcId())}
-                                    );
+                                // Update database
+                                getContentResolver().update(
+                                        CryptoContract.CurrencyEntry.CONTENT_URI,
+                                        contentValues1,
+                                        "_id = ?",
+                                        new String[]{String.valueOf(element.getcId())}
+                                );
 
 
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
                             }
+                        } catch (NullPointerException e) {
 
-                            return null;
+                            Log.i("Error", "Update error iterating over the data ... " + e);
+                        } catch (IllegalFormatException f) {
+
+                            Log.i("Error", "Update format error ... " + f);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    };
 
-                    ContentValues contentValues = new ContentValues();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Remove the API call icon in Actionbar
+                                refreshMenuItem = menu.findItem(R.id.menu_refresh);
+                                refreshMenuItem.setVisible(false);
+                            }
+                        }, 8000);
+                    } else {
 
-                    task.execute(contentValues);
+                        try {
+
+                            for (Currency element : data) {
+
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
+                                contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
+
+                                // Insert data into SQLiteDatabase
+                                getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, contentValues1);
 
 
-                } catch (NullPointerException e) {
+                            }
+                        } catch (NullPointerException e) {
 
-                    Log.i("Error", "Update error iterating over the data ... " + e);
+                            Log.i("Error", "database insert error no data to iterate over ... " + e);
+                        } catch (IllegalFormatException f) {
+
+                            Log.i("Error", "Update format error ... " + f);
+                        } catch (Exception e) {
+
+                            e.printStackTrace();
+
+                        }
+
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Remove the API call icon in Actionbar
+                                refreshMenuItem = menu.findItem(R.id.menu_refresh);
+                                refreshMenuItem.setVisible(false);
+                            }
+                        }, 8000);
+
+                    }
+                } catch (NullPointerException n) {
+                    Log.i("Error", "");
                 } catch (IllegalFormatException f) {
-
                     Log.i("Error", "Update format error ... " + f);
                 }
 
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //Remove the API call icon in Actionbar
-                        refreshMenuItem = menu.findItem(R.id.menu_refresh);
-                        refreshMenuItem.setVisible(false);
-                    }
-                }, 8000);
-
-
-            } else {
-
-                try {
-
-                    @SuppressLint("StaticFieldLeak") AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(ContentValues... contentValues) {
-                            ContentValues contentValues1 = contentValues[0];
-                            try {
-                                for (Currency element : data) {
-
-                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_CURRENCY_NAME, element.getcName());
-                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_ETH_VALUE, element.getcEthValue());
-                                    contentValues1.put(CryptoContract.CurrencyEntry.COLUMN_BTC_VALUE, element.getcBtcValue());
-
-                                    // Insert data into SQLiteDatabase
-                                    getContentResolver().insert(CryptoContract.CurrencyEntry.CONTENT_URI, contentValues1);
-
-
-                                }
-                            } catch (Exception e) {
-
-                                e.printStackTrace();
-
-                            }
-                            return null;
-                        }
-                    };
-
-                    ContentValues contentValues = new ContentValues();
-                    task.execute(contentValues);
-
-
-                } catch (NullPointerException e) {
-
-                    Log.i("Error", "database insert error no data to iterate over ... " + e);
-                } catch (IllegalFormatException f) {
-
-                    Log.i("Error", "Update format error ... " + f);
-                }
-
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //Remove the API call icon in Actionbar
-                        refreshMenuItem = menu.findItem(R.id.menu_refresh);
-                        refreshMenuItem.setVisible(false);
-                    }
-                }, 8000);
-
-
+                return null;
             }
-        } catch (NullPointerException g) {
+        };
 
-            Log.i("Error", "Database existent confirmation error " + g);
-
-        } catch (IllegalFormatException f) {
-
-            Log.i("Error", "Update format error ... " + f);
-        }
+        ContentValues c = new ContentValues();
+        task.execute(c);
 
     }
 
