@@ -173,7 +173,6 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     spinner.setSelection(columnPosition - 1);
                     spinnerChecker();
-
                 }
 
                 if (currency_code != null) {
@@ -230,7 +229,6 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
                         // Top image for CardView
                         cryptImage.setImageResource(R.drawable.bitcoin);
                         cursor.close();
-
                     }
 
                 }
@@ -265,20 +263,15 @@ public class CardActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 if (!curSpinnerClicked) {
 
-
                     if (currency_code != null) {
                         if (currency_code.equals(ETH_CODE)) {
 
                             curSpinner.setSelection(0);
-
                         }
                         if (currency_code.equals(BTC_CODE)) {
 
                             curSpinner.setSelection(1);
-
                         }
-
-
                     }
 
                     cryptoCurSpinnerChecker();
