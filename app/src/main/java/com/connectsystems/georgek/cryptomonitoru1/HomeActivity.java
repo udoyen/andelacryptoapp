@@ -300,7 +300,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
                 try {
                     // Check if database table already present, if it exists
                     // then update current records instead of inserting.
-                    found = isConnected();
+                    found = isTableExists();
                     if (found) {
                         try {
                             for (Currency element : data) {
